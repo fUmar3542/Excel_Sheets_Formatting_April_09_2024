@@ -1,0 +1,43 @@
+﻿Factor Names,FactorID,factor_group
+Short Term Treasury,LD12TRUU Index,macro
+Equity,SPTR Index,macro
+LargeCap,RIY Index,macro
+SmallCap,RTY Index,macro
+Growth Equity,RAG Index,macro
+Value Equity,RAV Index,macro
+BondAgg,LBUSTRUU Index,macro
+BondHY,HYG Equity,macro
+Momentum,MTUM Equity,macro
+Oil,CL1 Comdty,macro
+Gold,GC1 Curncy,macro
+Commodity,GSG Equity,macro
+IntlEquity,MXEA Index,macro
+EMEquity,MXEF Index,macro
+DollarIndex,DXY Index,macro
+Size (L-S),RIY less RTY,macro
+Valuation (G-V),RAG less RAV,macro
+Volatility,PVOLAUS Index,macro
+10YRRates,TY1 Comdty,macro
+ConsDisc,S5COND Index,sector
+ConsStap,S5CONS Index,sector
+Energy,S5ENRS Index,sector
+Financials,S5FINL Index,sector
+HealthCare,S5HLTH Index,sector
+Industrials,S5INDU Index,sector
+Tech,S5INFT Index,sector
+Materials,S5MATR Index,sector
+RealEstate,S5RLST Index,sector
+Telecom,S5TELS Index,macro
+Utilities,S5UTIL Index,macro
+Crowdedness,HTUSHFHI Equity,macro
+Short Interest,GSCBMSAL Equity,macro
+Cyclicality,MXCXDRN Index,macro
+Leverage,PLEVERUS Index,macro
+Profitability,PPROFTUS Index,macro
+EarningsVariability,PEARNVUS Index,macro
+DividendYield,PDIVYUS Index,macro
+Software,S5SFTW Index,sector
+Hardware,S5TECH Index,sector
+Semiconductors,S5SSEQX Index,sector
+Internet,S15INRE Index,sector
+Nasdaq,CCMP Index,macro

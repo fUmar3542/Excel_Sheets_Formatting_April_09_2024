@@ -1,0 +1,90 @@
+# Global settings
+global_settings:
+  annualization_factor: 252
+  var_nbdays_ago: 182 # This is the lookback window
+  risk_free_rate: 0.055 #should be overnight rate but you can use T-Bill yield
+  column_position_grouping: UnderlierName  # "UnderlierName" if FirmName not in ['OneOak'] else "Description"
+  decay factor: 0.94 # Setting the exponential decay
+  quantiles: # This assumes a normal distribution
+    VaR95: 1.644854
+    VaR99: 2.326348
+  option types: [call,option,put]   
+  non option types: [fixed,future,public,prefer,common,reit,fund,mlp,adr,depositary,etp]
+  fund name alias: Strat
+  stress_test_ranges:
+    price_shock:
+      - -0.2
+      - -0.1
+      - -0.05
+      - -0.02
+      - -0.01
+      - 0.0
+      - 0.01
+      - 0.02
+      - 0.05
+      - 0.1
+      - 0.2
+    vol_shock:
+      - -0.5
+      - -0.4
+      - -0.3
+      - -0.2
+      - -0.1
+      - 0.0
+      - 0.1
+      - 0.2
+      - 0.3
+      - 0.4
+      - 0.5
+  file_paths:  # File paths for main.py and VaR engine
+    factors: "funds/{investment_advisor}/factors_{investment_advisor}.csv"
+    prices: "funds/{investment_advisor}/prices_{investment_advisor}_{holdings_date}.csv"
+    positions: "funds/{investment_advisor}/positions_{investment_advisor}_{holdings_date}.csv"
+    var_data: "funds/{investment_advisor}/var_data_{fund}_{holdings_date}.xlsx"
+    historical_pnl_nav: "funds/{investment_advisor}/Historical Pnl and Nav {investment_advisor}-{holdings_date}.xlsx"  
+    benchmarks_histo: "funds/{investment_advisor}/Benchmarks_histo_{investment_advisor}.xlsx"
+funds:
+  - investment_advisor: Interval # this is advisor and also firmname
+    fundslist: ['INDSH','RPMF', 'ANSWY', 'SBNR', 'TBMF', 'INTERVALMASTERFUND'] # code will produce reports for all these and a "firm" report
+    benchmark: SPX Index    #varies by fund
+    holdings_date: "2024-02-21"
+    factors_to_report:
+      - Equity
+      - Size (L-S)
+      - Valuation (G-V)
+      - Momentum
+      - IntlEquity
+      - EMEquity
+      - Crowdedness
+      - Short Interest
+      - Cyclicality
+      - Leverage
+      - Profitability
+      - EarningsVariability
+      - DividendYield
+      - Volatility
+      - 10YRRates
+      - BondAgg
+      - BondHY
+      - Oil
+      - Gold
+      - Commodity
+      - DollarIndex
+      - ConsDisc
+      - ConsStap
+      - Energy
+      - Financials
+      - HealthCare
+      - Industrials
+      - Tech
+      - Materials
+      - RealEstate
+      - Telecom
+      - Utilities
+    custom_outputs: #These are outputs specific to the firm/fund in question (CRM add analyst_exposure, type_exposure)
+      - betaheatmap
+      - macro_Factor_Top_10_tbls
+      - beta_exposures_sheet
+      - generate_delta_sheet
+
+  
