@@ -26,10 +26,7 @@ def add_header_style(workbook, temp=None) -> Any:
     style.set_align(ALIGN_CENTER)
     style.set_bg_color(DARK_BLUE_COLOR)
     style.set_bold(True)
-    if temp:
-        style.set_font_name("Calibri")
-    else:
-        style.set_font_name(TEXT_FONT)
+    style.set_font_name(TEXT_FONT)
     style.set_font_color(WHIE_COLOR)
     style.set_size(TEXT_SIZE)
     style.set_num_format(PERCENTAGE_ROUND_FORMAT)
