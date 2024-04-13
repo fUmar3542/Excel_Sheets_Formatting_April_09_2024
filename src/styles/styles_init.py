@@ -6,7 +6,7 @@ from . import header_styles as hs
 from . import table_styles as ts
 from .table_styles import (CURRENCY_FORMAT, FLOAT_FORMAT,
                            FLOAT_NO_COLOR_FORMAT, INTEGER_FORMAT,
-                           PERCENTAGE_FORMAT, PERCENTAGE_NO_COLOR_FORMAT)
+                           PERCENTAGE_FORMAT, PERCENTAGE_NO_COLOR_FORMAT, PERCENTAGE_ROUND_FORMAT)
 
 FORMATS = {
     'currency_text': CURRENCY_FORMAT,
@@ -15,6 +15,7 @@ FORMATS = {
     'black_float': FLOAT_NO_COLOR_FORMAT,
     'float': FLOAT_FORMAT,
     'integer': INTEGER_FORMAT,
+    'percentage_round': PERCENTAGE_ROUND_FORMAT
 }
 
 

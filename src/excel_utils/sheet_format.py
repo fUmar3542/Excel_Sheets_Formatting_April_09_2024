@@ -15,7 +15,7 @@ def format_dashboard_worksheet(worksheet, layout) -> None:
     for col in layout.MIDDLE_COLUMNS:
         worksheet.set_column(f'{col}:{col}', layout.MIDDLE_COLUMNS_WIDTH)
 
-    worksheet.set_zoom(80)
+    worksheet.set_zoom(100)
     worksheet.hide_gridlines(2)
     worksheet.repeat_rows(0, 4)
     worksheet.print_area(0, 0, 250, len(layout.columns)+1)

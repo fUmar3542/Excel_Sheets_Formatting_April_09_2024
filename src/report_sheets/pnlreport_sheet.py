@@ -11,8 +11,11 @@ from src.layouts.layouts import DashboardLayout, PnlReportLayout
 
 from ..report_items.report_table import ReportTable
 from ..report_items.snap_operations import SnapType
-from ..report_items.worksheet_chart import WorksheetChart
+from ..report_items.worksheet_chart import WorksheetChart, WorksheetChart4
 from datetime import datetime
+
+import xlsxwriter
+import matplotlib.pyplot as plt
 
 PNLDATA_SHEET_NAME = "PNLReport"
 
@@ -31,7 +34,7 @@ def generate_pnlreport_sheet(
     date_obj = datetime.strptime(holdings_date, "%Y-%m-%d")
     insert_header(worksheet, styles, layout, holdings_date=date_obj, fund=fund, title=title)
 
-    daily_returns_chart = WorksheetChart(
+    daily_returns_chart = WorksheetChart4(
         initial_position=(1, 4),
         initial_rows=20,
         table_name="aum_clean",
@@ -45,9 +48,9 @@ def generate_pnlreport_sheet(
         custom_height=445,
     )
 
-    cumulative_returns_chart = WorksheetChart(
+    cumulative_returns_chart = WorksheetChart4(
         initial_position=(1, 5),
-        initial_rows=10,
+        initial_rows=20,
         table_name="aum_clean",
         columns=[
             "Cumulative return",
@@ -127,7 +130,7 @@ def generate_pnlreport_sheet(
 
     refsnap = monthly_pnl_stats if FirmName =="IBIS" else perf_ratio_stats
 
-    volatility_stats = WorksheetChart(
+    volatility_stats = WorksheetChart4(
         snap_element=refsnap,
         snap_mode=SnapType.DOWN,
         margin=2,
@@ -148,7 +151,7 @@ def generate_pnlreport_sheet(
         stacked=False,
     )
 
-    volatility_budget = WorksheetChart(
+    volatility_budget = WorksheetChart4(
         snap_element=refsnap,
         snap_mode=SnapType.DOWN,
         margin=28,
@@ -168,5 +171,74 @@ def generate_pnlreport_sheet(
         chart_type="line",
         stacked=False,
     )
+
+    # # dates = []
+    # # daily_return = []
+    # # cumulative_return = []
+    #
+    # dates = ["2024-04-01", "2024-04-05", "2024-04-10", "2024-04-13"]
+    #
+    # # Sample daily returns (replace with your actual values)
+    # daily_return = [2, 1, -3, 4]
+    #
+    # cumulative_return = [daily_return[0]]  # Starting cumulative return is the first daily return
+    # for i in range(1, len(daily_return)):
+    #   cumulative_return.append(cumulative_return[i-1] + daily_return[i])
+    #
+    #
+    # # Create the line chart (pic 1)
+    # plt.figure(figsize=(10, 6))
+    # plt.plot(dates, daily_return, marker='o', label='Daily Return')
+    # plt.plot(dates, cumulative_return, marker='o', label='Cumulative Return')
+    # plt.xlabel('Date')
+    # plt.ylabel('Return')
+    # plt.title('Daily vs. Cumulative Returns')
+    # plt.grid(True)
+    # plt.legend()
+    #
+    # # Create the stacked bar chart (pic 2) for reference
+    # plt.figure(figsize=(10, 6))
+    # x = range(len(dates))
+    # plt.bar(x, daily_return, bottom=cumulative_return, label='Daily Return')
+    # plt.bar(x, cumulative_return, label='Cumulative Return')
+    # plt.xticks(x, dates, rotation=45)
+    # plt.xlabel('Date')
+    # plt.ylabel('Return')
+    # plt.title('Daily vs. Cumulative Returns')
+    # plt.grid(True)
+    # plt.legend()
+    #
+    # # Save the matplotlib charts as images (optional)
+    # plt.figure(1).savefig('pic_1.png')
+    # plt.figure(2).savefig('pic_2.png')
+    #
+    # worksheet.write('A50', 'Dates')
+    # worksheet.write('B50', 'Daily Return')
+    # worksheet.write('C50', 'Cumulative Return')
+    #
+    # for i in range(len(dates)):
+    #     worksheet.write(i+3, 0, dates[i])
+    #     worksheet.write(i+3, 1, daily_return[i])
+    #     worksheet.write(i+3, 2, cumulative_return[i])
+    #
+    # # Add a chart for pic 1 (line chart)
+    # chart1 = writer.add_chart({'type': 'line'})
+    #
+    # chart1.add_series({
+    #     'name': '=Sheet1!$B$2',
+    #     'categories': '=Sheet1!$A$4:$A$16',
+    #     'values': '=Sheet1!$B$4:$B$16',
+    #     'line': {'color': 'blue'}
+    # })
+    #
+    # chart1.add_series({
+    #     'name': '=Sheet1!$C$2',
+    #     'categories': '=Sheet1!$A$4:$A$16',
+    #     'values': '=Sheet1!$C$4:$C$16',
+    #     'line': {'color': 'red'}
+    # })
+    #
+    # worksheet.insert_chart('D2', chart1)
+
 
     format_dashboard_worksheet(worksheet, layout)

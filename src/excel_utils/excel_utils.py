@@ -197,14 +197,14 @@ def insert_chart(
         x_axis_labels: list of X-axis labels (optional)
     '''
     chart, position = _set_chart_object(workbook, worksheet_chart, chart_type, stacked)
-    if chart_type != 'column':  # Check if chart type is not column
-        chart.set_legend({'position': 'top'})  # If not column, set legend to top
-    else:
-        chart.set_legend({'position': 'bottom'})  # If column, set legend to bottom
+    # if chart_type not in ['column', 'Line']:  # Check if chart type is not column
+    #     chart.set_legend({'position': 'top'})  # If not column, set legend to top
+    # else:
+    #     chart.set_legend({'position': 'bottom'})  # If column, set legend to bottom
+    chart.set_legend({'position': 'bottom'})
 
     chart.set_x_axis({'label_position': 'low'})
     worksheet.insert_chart(row=position[1], col=position[0], chart=chart)
-
 
 
 def insert_dual_axis_chart(    workbook,    worksheet,     worksheet_chart_bars: WorksheetChart,     worksheet_chart_line: WorksheetChart) -> None:
@@ -228,13 +228,18 @@ def insert_dual_axis_chart(    workbook,    worksheet,     worksheet_chart_bars:
         chart_type='line',
         stacked=False,
         series_type='time_series',
-        # y2_axis= True,
+        y2_axis=True,
     )
+    # series_chart.set_y2_axis({'name': worksheet_chart_line.columns[0].capitalize()})
     bar_chart.combine(series_chart)
+    bar_chart.set_x_axis({'label_position': 'low'})
+    # bar_chart.set_y_axis({'name': worksheet_chart_bars.columns[0].capitalize()})
+    # bar_chart.y2_axis['name'] = worksheet_chart_line.columns[0].capitalize()
+    # bar_chart.x_axis['defaults']['major_gridlines']['visible'] = 1
     
     worksheet.insert_chart(
-        row=bar_chart_position[1],
         col=bar_chart_position[0],
+        row=bar_chart_position[1],
         chart=bar_chart
     )
 
@@ -307,7 +312,17 @@ def _set_chart_object(
         SERIES_SETTERS.get(series_type, _add_series), 
         y2_axis
     )
+    if y2_axis:
+        _set_y2_axis_format(
+            chart,
+            FORMATS.get(f'{worksheet_chart.axis_format}_text')  # type: ignore
+        )
+        # chart.set_y2_axis({'num_format': FORMATS.get(f'{worksheet_chart.axis_format}_text')})
+    # if True:
+    #     chart.y_axis.defaults['num_format'] = '# ##0.00%'
+    # chart.set_y_axis_title(worksheet_chart.columns[0])
     return chart, position
+
 
 def _create_chart(workbook, chart_type: str = 'column', stacked=True):
     chart_options = {'type': chart_type, }
@@ -320,12 +335,15 @@ def _create_chart(workbook, chart_type: str = 'column', stacked=True):
 def _set_axis_format(chart, axis_format: str):
     chart.set_y_axis({'num_format': axis_format})
 
+def _set_y2_axis_format(chart, axis_format: str):
+    chart.set_y2_axis({'num_format': axis_format})
+
 def _set_chart_title(worksheet_chart, chart):
     chart_title = worksheet_chart.title \
         if worksheet_chart.title else worksheet_chart.categories_name
     chart.set_title({
         'name': chart_title,
-        'overlay': True,
+        'overlay': False,
     })
 
 

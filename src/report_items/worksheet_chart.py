@@ -139,7 +139,7 @@ class WorksheetChart4(ReportItem):
     initial_rows: int = 18
     title: str = None  # type: ignore
     stacked: bool = True
-    axis_format: str = 'float'
+    axis_format: str = 'percentage'
     custom_height: Optional[int] = None
     custom_width: Optional[int] = None
     custom_padding: Optional[int] = None
