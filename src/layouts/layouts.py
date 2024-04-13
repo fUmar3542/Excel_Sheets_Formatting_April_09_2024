@@ -121,9 +121,10 @@ class WideDashboardLayout(DashboardLayout):
 
 class WideDashboardLayout1(DashboardLayout):
     '''contains 4 category columns'''
+    SIDE_COLUMNS = ['A', 'T']
     CATEGORY_COLUMNS = ['B', 'G', 'L', 'Q']
-    MIDDLE_COLUMNS = ['E', 'F', 'J', 'N']
-    NUMERIC_COLUMNS = ['C', 'D', 'H', 'I', 'K', 'M', 'P', 'O', 'R', 'S']
+    MIDDLE_COLUMNS = ['E', 'F', 'J', 'K', 'O', 'P']
+    NUMERIC_COLUMNS = ['C', 'D', 'H', 'I', 'M', 'N', 'R', 'S']
 
 
 class ExposureDashboardLayout(DashboardLayout):
