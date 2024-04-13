@@ -98,17 +98,32 @@ class NarrowDashboardLayout(DashboardLayout):
     MIDDLE_COLUMNS = ['K', ]
 
 
+class NarrowDashboardLayout1(DashboardLayout):
+    SIDE_COLUMNS = ['A', 'K']
+    CATEGORY_COLUMNS = ['B']
+    NUMERIC_COLUMNS = ['C', 'D', 'E', 'G', 'H', 'I', 'J']
+    MIDDLE_COLUMNS = ['K', ]
+
+
 class PnlReportLayout(DashboardLayout):
     SIDE_COLUMNS = ['A', 'P']
     CATEGORY_COLUMNS = ['B', 'F']
     NUMERIC_COLUMNS = ['C', 'D', 'E', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
     MIDDLE_COLUMNS = []
 
+
 class WideDashboardLayout(DashboardLayout):
     '''contains 4 category columns'''
     CATEGORY_COLUMNS = ['B', 'F', 'J', 'N']
     MIDDLE_COLUMNS = ['E', 'I', 'M']
     NUMERIC_COLUMNS = ['C', 'D', 'G', 'H', 'K', 'L', 'O', 'P']
+
+
+class WideDashboardLayout1(DashboardLayout):
+    '''contains 4 category columns'''
+    CATEGORY_COLUMNS = ['B', 'G', 'L', 'Q']
+    MIDDLE_COLUMNS = ['E', 'F', 'J', 'N']
+    NUMERIC_COLUMNS = ['C', 'D', 'H', 'I', 'K', 'M', 'P', 'O', 'R', 'S']
 
 
 class ExposureDashboardLayout(DashboardLayout):

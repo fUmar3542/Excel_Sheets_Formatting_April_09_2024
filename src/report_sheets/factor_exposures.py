@@ -5,7 +5,7 @@ import src.excel_utils.report_group_operations as rgo
 from src.excel_utils.header import insert_header
 from src.excel_utils.set_up_workbook import set_up_workbook
 from src.excel_utils.sheet_format import format_dashboard_worksheet
-from src.layouts.layouts import WideDashboardLayout
+from src.layouts.layouts import WideDashboardLayout, WideDashboardLayout1
 
 from ..report_items.report_table import ReportTable
 from ..report_items.snap_operations import SnapType
@@ -30,7 +30,8 @@ def generate_factor_exposures_sheet(
     title: str,
     data: Dict,
 ) -> None:
-    layout = WideDashboardLayout()
+    # layout = WideDashboardLayout()
+    layout = WideDashboardLayout1()
     styles, worksheet = set_up_workbook(writer, sheet_name=SHEET_NAME)
     date_obj = datetime.strptime(holdings_date, "%Y-%m-%d")
     insert_header(worksheet, styles, layout, fund, date_obj, title=title)
@@ -61,7 +62,7 @@ def generate_factor_exposures_sheet(
         axis_format="percentage",
         custom_padding=1
     )
-    macro_sensitivity_chart.custom_width = 1070
+    macro_sensitivity_chart.custom_width = 1260
     macro_sensitivity_chart = increase_size(macro_sensitivity_chart)
     eu.insert_chart(
         writer,
@@ -119,8 +120,8 @@ def generate_factor_exposures_sheet(
         page_layout=layout,
         margin=1,
         axis_format="percentage",
-        custom_padding=0,
-        custom_width=1070
+        custom_padding=1,
+        custom_width=1260
     )
     sector_sensitivity_chart = WorksheetChart4(
         table_name=table_name,
@@ -132,7 +133,7 @@ def generate_factor_exposures_sheet(
         margin=1,
         axis_format="percentage",
         custom_padding=0,
-        custom_width=1070
+        custom_width=1260
     )
     sector_sensitivity_chart = increase_size(sector_sensitivity_chart)
     sector_sensitivity_chart.position = sector_sensitivity_chart1.position

@@ -5,16 +5,18 @@ import src.excel_utils.report_group_operations as rgo
 from src.excel_utils.header import insert_header
 from src.excel_utils.set_up_workbook import set_up_workbook
 from src.excel_utils.sheet_format import format_dashboard_worksheet
-from src.layouts.layouts import NarrowDashboardLayout
+from src.layouts.layouts import NarrowDashboardLayout, NarrowDashboardLayout1
 
 from ..report_items.snap_operations import SnapType
 from datetime import datetime
 
 SHEET_NAME = "VaRReport"
 
+
 def set_column_widths(worksheet, start_col, end_col, width):
     # Set the column widths. Assuming 0-index based (A=0, B=1, etc.)
     worksheet.set_column(start_col, end_col, width)
+
 
 def generate_var_report_sheet(
     writer,
@@ -25,7 +27,7 @@ def generate_var_report_sheet(
 ) -> None:
     """Generates var report"""
 
-    layout = NarrowDashboardLayout()
+    layout = NarrowDashboardLayout1()
     styles, worksheet = set_up_workbook(writer, sheet_name=SHEET_NAME)
     date_obj = datetime.strptime(holdings_date, "%Y-%m-%d")
     insert_header(worksheet, styles, layout, fund, date_obj, title=title)

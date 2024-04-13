@@ -99,7 +99,7 @@ def init_row(
         global_snap_mode=SnapType.DOWN,
         global_margin=2,
         inner_snap_mode=SnapType.RIGHT,
-        inner_margin=1,
+        inner_margin=2,
         table_names=row_table_names,
         tables=row_data,
         styles=styles,

@@ -13,6 +13,7 @@ from datetime import datetime
 
 SHEET_NAME = 'Options&Stress'
 
+
 def generate_options_stress_sheet(writer, fund: str, holdings_date: str, title: str, data: List[
     Dict]) -> None:
     '''generates var report'''
