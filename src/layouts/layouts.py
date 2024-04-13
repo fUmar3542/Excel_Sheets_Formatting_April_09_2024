@@ -141,6 +141,12 @@ class StressDashboardLayout(DashboardLayout):
     NUMERIC_COLUMNS = ['B','C', 'D', 'E', 'F','G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
 
 
+class StressDashboardLayout1(DashboardLayout):
+    SIDE_COLUMNS = ['A', 'O', ]
+    CATEGORY_COLUMNS = ['B',]
+    MIDDLE_COLUMNS = []
+    NUMERIC_COLUMNS = ['C', 'D', 'E', 'F','G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
+
 class PositionsDashboardLayout(DashboardLayout):
     SIDE_COLUMNS = ['A', ]
     CATEGORY_COLUMNS = ['B', ]

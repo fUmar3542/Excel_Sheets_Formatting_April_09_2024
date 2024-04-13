@@ -5,7 +5,7 @@ import src.excel_utils.report_group_operations as rgo
 from src.excel_utils.header import insert_header
 from src.excel_utils.set_up_workbook import set_up_workbook
 from src.excel_utils.sheet_format import format_dashboard_worksheet
-from src.layouts.layouts import StressDashboardLayout
+from src.layouts.layouts import StressDashboardLayout, StressDashboardLayout1
 from src.report_items.report_table import ReportTable
 
 from ..report_items.snap_operations import SnapType
@@ -18,7 +18,7 @@ def generate_options_stress_sheet(writer, fund: str, holdings_date: str, title: 
     Dict]) -> None:
     '''generates var report'''
 
-    layout = StressDashboardLayout()
+    layout = StressDashboardLayout1()
     styles, worksheet = set_up_workbook(writer, sheet_name=SHEET_NAME)
     date_obj = datetime.strptime(holdings_date, "%Y-%m-%d")
     insert_header(worksheet, styles, layout, fund, date_obj, title=title)
@@ -112,14 +112,15 @@ def generate_options_stress_sheet(writer, fund: str, holdings_date: str, title: 
     #initial_position = (1, 67)
     sector_stress_test_table = ReportTable(
         data=sector_stress_test_df,
-        values_format=[None, styles.get("currency"),styles.get("percentage"),styles.get("currency"),styles.get("percentage"),styles.get("currency"),styles.get("percentage"),styles.get("currency"),styles.get("percentage"),styles.get("currency"),styles.get("percentage")],
+        values_format=[styles.get("currency"), styles.get("currency"),styles.get("percentage"),styles.get("currency"),styles.get("percentage"),styles.get("currency"),styles.get("percentage"),styles.get("currency"),styles.get("percentage"),styles.get("currency"),styles.get("percentage")],
         header_format=styles.get("table_header"), 
         total_format=styles.get("table_total"),   
         table_name="sector_stress_test",
-        snap_element=formatted_table,
+        snap_element=formatted_report_tables[-1],
         snap_mode=SnapType.DOWN,
         margin=2,
     )
+    sector_stress_test_table.position = (1, sector_stress_test_table.position[1])
     eu.insert_table(worksheet, sector_stress_test_table)
         
     format_dashboard_worksheet(worksheet, layout)

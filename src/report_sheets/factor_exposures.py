@@ -62,7 +62,7 @@ def generate_factor_exposures_sheet(
         axis_format="percentage",
         custom_padding=1
     )
-    macro_sensitivity_chart.custom_width = 1350
+    macro_sensitivity_chart.custom_width = 1330
     macro_sensitivity_chart = increase_size(macro_sensitivity_chart)
     eu.insert_chart(
         writer,
@@ -121,7 +121,7 @@ def generate_factor_exposures_sheet(
         margin=1,
         axis_format="percentage",
         custom_padding=1,
-        custom_width=1350
+        custom_width=1330
     )
     sector_sensitivity_chart = WorksheetChart4(
         table_name=table_name,
@@ -133,7 +133,7 @@ def generate_factor_exposures_sheet(
         margin=1,
         axis_format="percentage",
         custom_padding=0,
-        custom_width=1350
+        custom_width=1330
     )
     sector_sensitivity_chart = increase_size(sector_sensitivity_chart)
     sector_sensitivity_chart.position = sector_sensitivity_chart1.position

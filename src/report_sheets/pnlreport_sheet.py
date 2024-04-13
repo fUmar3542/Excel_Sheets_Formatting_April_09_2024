@@ -16,6 +16,7 @@ from datetime import datetime
 
 PNLDATA_SHEET_NAME = "PNLReport"
 
+
 def generate_pnlreport_sheet(
     writer,
     fund: str,
@@ -98,7 +99,7 @@ def generate_pnlreport_sheet(
     )
     eu.insert_table(worksheet, comparative_analysis_stats)
 
-    if  FirmName !="CRM":
+    if FirmName != "CRM":
         fund_AUM = ReportTable(
             data=data_dict.get("fund_AUM"),  # type: ignore
             header_format=styles.get("table_header"), 
@@ -167,4 +168,5 @@ def generate_pnlreport_sheet(
         chart_type="line",
         stacked=False,
     )
+
     format_dashboard_worksheet(worksheet, layout)

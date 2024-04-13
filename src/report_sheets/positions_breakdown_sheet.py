@@ -26,8 +26,8 @@ def generate_positions_breakdown_sheet(
     insert_header(worksheet, styles, layout, fund, date_obj, title=title)
 
     raw_formats = [
-        None,
-        None,
+        "currency",
+        "currency",
         "integer",
         "percentage",
         "float",

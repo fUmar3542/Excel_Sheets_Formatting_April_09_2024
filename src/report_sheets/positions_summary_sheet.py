@@ -26,7 +26,7 @@ def generate_positions_summary_sheet(
     insert_header(worksheet, styles, layout, fund, date_obj, title=title)
 
     raw_formats = (
-        [None, "integer", "percentage"]
+        ["currency", "integer", "percentage"]
         + ["float"] * 2
         + ["percentage", "currency"]
         + ["currency", "percentage"] * 2
