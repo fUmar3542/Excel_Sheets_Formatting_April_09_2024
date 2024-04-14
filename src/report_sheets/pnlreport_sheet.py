@@ -74,7 +74,7 @@ def generate_pnlreport_sheet(
     eu.insert_table(worksheet, return_analysis_stats)
 
     dd = data_dict.get("perf_ratio_stats")
-    dd.index.name="perf analysis"
+    dd.index.name="Performance Analysis"
     perf_ratio_stats = ReportTable(
         data=dd,  # type: ignore
         values_format=styles.get("float"),
@@ -154,7 +154,7 @@ def generate_pnlreport_sheet(
     volatility_budget = WorksheetChart4(
         snap_element=refsnap,
         snap_mode=SnapType.DOWN,
-        margin=28,
+        margin=23,
         table_name="aum_clean",
         columns=["20D Volatility", "Volatility Budget"],
         categories_name="index_date",
