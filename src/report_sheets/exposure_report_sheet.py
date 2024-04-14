@@ -64,7 +64,7 @@ def generate_exp_report_sheet(
         categories_name=first_row_tableid1,
         axis_format="percentage",
         custom_height=330,
-        margin=1,
+        margin=2,
         custom_padding=1,
     )
     report_charts.append(firstrow_chart)
