@@ -39,10 +39,14 @@ def generate_var_report_sheet(
     report_tables = []
     report_charts = []
 
+    df = data[0].get("var_top10").copy()
+    df = df.rename(columns={'Inc95VaR': '95VaR', 'Inc99VaR': '99VaR'})
+    df1 = data[0].get("var_bottom10").copy()
+    df1 = df1.rename(columns={'Inc95VaR': '95VaR', 'Inc99VaR': '99VaR'})
     first_row_tables = rgo.init_report_group(
         styles=styles,
         table_names=["var_top10", "var_bottom10"],
-        tables=[data[0].get("var_top10")[['Inc95VaR','Inc99VaR']], data[0].get("var_bottom10")[['Inc95VaR','Inc99VaR']]],  # type: ignore
+        tables=[df[['95VaR','99VaR']], df1[['95VaR','99VaR']]],  # type: ignore
         inner_snap_mode=SnapType.RIGHT,
         inner_margin=1,
         initial_position=(1, 5),  # type: ignore
@@ -50,7 +54,7 @@ def generate_var_report_sheet(
     report_tables.extend(first_row_tables)
 
     ancor_item = report_tables[0]
-    next_row_margin = 5
+    next_row_margin = 2
     for table_name, table_data in data[1].items():
         if table_data is not None:
             row_table, row_chart = rgo.init_table_with_chart(
