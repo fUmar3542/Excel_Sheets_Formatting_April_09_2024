@@ -52,7 +52,8 @@ def apply_leftandup_header_format(worksheet, table: ReportTable, style) -> None:
 def insert_table(
     worksheet: worksheet,  # type: ignore
     report_table: ReportTable,
-    date_index: bool = False
+    date_index: bool = False,
+    temp:bool = False
 ) -> None:
     '''
     writes a given table and formats it as a table

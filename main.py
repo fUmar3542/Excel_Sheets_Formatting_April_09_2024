@@ -15,7 +15,7 @@ import xlsxwriter
 
 
 # Global use of YAML file 
-yaml_file = f"CRM.yml"
+yaml_file = f"Interval.yml"
 if os.path.exists(yaml_file):
     with open(yaml_file, 'r') as file:
         config_data = yaml.safe_load(file)
@@ -671,6 +671,7 @@ if __name__ == "__main__": #Execution of main procedure for laumch in command li
                     "fund_exp_usd_dashboard": fund_exp_usd_dashboard,
                     "position_liquidity": position_liquidity,
                 },
+                nm=INVESTTMENT,
             )
         
             if not options_premium_df.empty: 
@@ -864,7 +865,8 @@ if __name__ == "__main__": #Execution of main procedure for laumch in command li
                     {
                         "stress_test_filtered_df": stress_test_filtered_df,
                     }
-                ]
+                ],
+                nm=INVESTTMENT
             )
 
             title = INVESTTMENT + " Delta Report"

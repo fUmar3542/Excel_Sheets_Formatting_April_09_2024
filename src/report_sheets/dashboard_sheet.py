@@ -21,6 +21,7 @@ def generate_dashboard_sheet(
     holdings_date: str,
     title: str,
     data: Dict,
+    nm: str
 ) -> None:
     """generate elements on the dashboard sheet"""
 
@@ -31,7 +32,7 @@ def generate_dashboard_sheet(
     insert_header(worksheet, styles, layout, fund, date_obj, title=title)
     # worksheet.set_default_row(21)
     report_tables = insert_dashboard_tables(data, styles, worksheet)
-    _charts = insert_dashboard_charts(writer, layout, worksheet, report_tables, data=data, styles=styles)
+    _charts = insert_dashboard_charts(writer, layout, worksheet, report_tables, nm=nm)
     format_dashboard_worksheet(worksheet, layout)
 
 
@@ -233,13 +234,13 @@ def increase_size(worksheet_chart):
 
 def increase_size_expose(worksheet_chart):
     num_rows = worksheet_chart.snap_element.shape[0]
-    if num_rows < 4:
+    if num_rows <= 4:
         num_rows = num_rows + 1
     worksheet_chart.custom_height = (num_rows+1) * 21
     return worksheet_chart
 
 
-def insert_dashboard_charts(writer, layout, worksheet, report_tables, data, styles):
+def insert_dashboard_charts(writer, layout, worksheet, report_tables, nm):
     charts = {}
     table_name = "sector_exposure_df"
     sector_exposure_chart1 = WorksheetChart4(
@@ -272,8 +273,9 @@ def insert_dashboard_charts(writer, layout, worksheet, report_tables, data, styl
 
     sector_exposure_chart = increase_size(sector_exposure_chart)
     sector_exposure_chart.position = sector_exposure_chart1.position
-    # x_axis_labels = ['NewLabel1', 'NewLabel2', 'NewLabel3', 'NewLabel4', 'NewLabel5', 'NewLabel6','NewLabel7', 'NewLabel8', 'NewLabel9','NewLabel10']
-    # sector_exposure_chart.set_x_axis({'name': 'New X Axis Name', 'categories': x_axis_labels})
+    if 'dipsea' in nm.lower():
+        if sector_exposure_chart.snap_element.data.shape[0] < 6:
+            sector_exposure_chart.custom_height = sector_exposure_chart.custom_height + 75
     eu.insert_chart(writer, worksheet, sector_exposure_chart)
     charts.update({table_name: sector_exposure_chart})
 
@@ -291,6 +293,9 @@ def insert_dashboard_charts(writer, layout, worksheet, report_tables, data, styl
         margin=1,
     )
     macro_factor_sensitivity_chart = increase_size(macro_factor_sensitivity_chart)
+    if 'dipsea' in nm.lower() and sector_exposure_chart.snap_element.data.shape[0] < 6:
+        macro_factor_sensitivity_chart.custom_height = macro_factor_sensitivity_chart.custom_height - 75
+        macro_factor_sensitivity_chart.position = (macro_factor_sensitivity_chart.position[0], macro_factor_sensitivity_chart.position[1]+3)
     eu.insert_chart(writer, worksheet, macro_factor_sensitivity_chart)
     charts.update({table_name: macro_factor_sensitivity_chart})
 

@@ -153,10 +153,10 @@ class ExposureDashboardLayout(DashboardLayout):
 
 class StressDashboardLayout(DashboardLayout):
     SIDE_COLUMNS = ['A', 'O', ]
-    CATEGORY_COLUMNS = []
+    CATEGORY_COLUMNS = ['B']
     MIDDLE_COLUMNS = []
-    NUMERIC_COLUMNS = ['D', 'E', 'F','G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
-    COMPRESSED_COLUMNS = ['B','C']
+    NUMERIC_COLUMNS = ['C', 'D', 'E', 'F','G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
+    COMPRESSED_COLUMNS = []
 
 
 class PositionsDashboardLayout(DashboardLayout):

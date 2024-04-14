@@ -15,7 +15,7 @@ SHEET_NAME = 'Options&Stress'
 
 
 def generate_options_stress_sheet(writer, fund: str, holdings_date: str, title: str, data: List[
-    Dict]) -> None:
+    Dict], nm:str) -> None:
     '''generates var report'''
 
     layout = StressDashboardLayout()
@@ -29,7 +29,7 @@ def generate_options_stress_sheet(writer, fund: str, holdings_date: str, title: 
     table_names = rgo.group_items(list(data[0].keys()), 2)  # type: ignore
     table_data = rgo.group_items(list(data[0].values()), 2)  # type: ignore
 
-    initial_position = (1, 6)
+    initial_position = (1, 5)
     global_snap_to = None
     
     # add tables of greeks 
@@ -50,8 +50,10 @@ def generate_options_stress_sheet(writer, fund: str, holdings_date: str, title: 
         report_tables.extend(row_tables)
         initial_position = None
         global_snap_to = row_tables[0]
-    
-    initial_position = (2, 6+startrowadd)
+
+    initial_position = (2, 5+startrowadd)
+    if len(report_tables) > 0:
+        initial_position = (2, 7+startrowadd)
     formatted_report_tables = rgo.init_report_group(
         styles=styles,
         table_names=list(data[1].keys()),
@@ -61,7 +63,7 @@ def generate_options_stress_sheet(writer, fund: str, holdings_date: str, title: 
         initial_position=initial_position,
         global_snap_to=report_tables[-2],
         global_snap_mode=SnapType.DOWN,
-        global_margin=7,
+        global_margin=8,
         format_name='black_percentage'
     )
 
@@ -75,6 +77,7 @@ def generate_options_stress_sheet(writer, fund: str, holdings_date: str, title: 
     ]
     top_captions = ['Equity Shock', 'Equity Shock', 'Equity Shock']
     left_caption = 'Volatility Shock'
+    count = 0
     for formatted_table, caption, label in zip(
         formatted_report_tables,
         top_captions,

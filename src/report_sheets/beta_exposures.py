@@ -49,7 +49,7 @@ def generate_beta_exposures_sheet(
         snap_element=macro_beta_decomp_df,
         snap_mode=SnapType.RIGHT,
         page_layout=layout,
-        margin=0,
+        margin=1,
         axis_format="percentage",
     )
     eu.insert_chart(
@@ -75,7 +75,7 @@ def generate_beta_exposures_sheet(
         snap_element=macro_beta_decomp_df,
         snap_mode=SnapType.RIGHT,
         page_layout=layout,
-        margin=0,
+        margin=1,
         axis_format="percentage",
     )
     eu.insert_chart(writer, worksheet, sector_sensitivity_chart)
