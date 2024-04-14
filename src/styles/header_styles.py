@@ -36,7 +36,7 @@ def add_header_date(workbook) -> Any:
     style.set_align(ALIGNEMENT)
     style.set_bottom(5)
 
-    # Set the date format to dd/mm/yyyy
-    style.set_num_format('dd/mm/yyyy')
+    # Set the date format to mm/dd/yyyy
+    style.set_num_format('mm/dd/yyyy')
 
     return style

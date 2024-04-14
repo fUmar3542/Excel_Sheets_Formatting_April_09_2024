@@ -896,6 +896,7 @@ if __name__ == "__main__": #Execution of main procedure for laumch in command li
                 position_breakdown.sort_values('Exposure', ascending = False).fillna(0),
             )
             title = INVESTTMENT + " Factor Correlation Report"
+            matrix_correlation.index.name = 'Factor Correlations'
             rsh.generate_factor_correlations_sheet(
                 writer,
                 matrix_correlation,

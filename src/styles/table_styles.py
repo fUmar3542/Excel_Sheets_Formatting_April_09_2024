@@ -34,6 +34,7 @@ def add_header_style(workbook, temp=None) -> Any:
     style.set_border_color(DARK_BLUE_COLOR)
     return style
 
+
 def add_total_style(workbook) -> Any:
     '''adds table style for the total '''
     style = workbook.add_format()
@@ -46,6 +47,7 @@ def add_total_style(workbook) -> Any:
     style.set_bottom(SOLID_BORDER_INDEX)
     #style.set_border_color(DARK_BLUE_COLOR)
     return style
+
 
 def add_total_pct_style(workbook) -> Any:
     '''adds table style for the total '''
@@ -133,6 +135,7 @@ def add_integer_format(workbook) -> Any:
 def add_percentage_format(workbook) -> Any:
     '''adds currency format'''
     return _add_num_format(workbook, PERCENTAGE_FORMAT)
+
 
 def add_percentage_round_format(workbook) -> Any:
     '''adds currency format'''
