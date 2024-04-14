@@ -12,6 +12,7 @@ FONT_SIZE = 8
 DPI = 92
 
 UNITS_TO_PIXELS = {
+    4:33,
     8: 61,
     12: 89,
     26: 187,
@@ -21,6 +22,7 @@ UNITS_TO_PIXELS = {
 class DashboardLayout:
     '''class stores information about page layout'''
     NUMERIC_COLUMNS_WIDTH = 12
+    COMPRESSED_COLUMNS_WIDTH = 4
     CATEGORY_COLUMNS_WIDTH = 26
     SIDE_COLUMNS_WIDTH = 8
     MIDDLE_COLUMNS_WIDTH = 8
@@ -33,6 +35,7 @@ class DashboardLayout:
                        'G', 'H', 'K','L', 'M', 'N', 'O']
     MIDDLE_COLUMNS = ['I', ]
     SIDE_COLUMNS = ['A', 'Q', ]
+    COMPRESSED_COLUMNS = []
 
     @property
     def widths(self) -> Dict[str, float]:
@@ -96,6 +99,7 @@ class NarrowDashboardLayout(DashboardLayout):
     CATEGORY_COLUMNS = ['B', 'G']
     NUMERIC_COLUMNS = ['C', 'D', 'E', 'H', 'I', 'J']
     MIDDLE_COLUMNS = ['K', ]
+    COMPRESSED_COLUMNS = []
 
 
 class NarrowDashboardLayout1(DashboardLayout):
@@ -103,6 +107,7 @@ class NarrowDashboardLayout1(DashboardLayout):
     CATEGORY_COLUMNS = ['B']
     NUMERIC_COLUMNS = ['C', 'D', 'E', 'G', 'H', 'I', 'J']
     MIDDLE_COLUMNS = ['K', ]
+    COMPRESSED_COLUMNS = []
 
 
 class PnlReportLayout(DashboardLayout):
@@ -110,6 +115,7 @@ class PnlReportLayout(DashboardLayout):
     CATEGORY_COLUMNS = ['B', 'F']
     NUMERIC_COLUMNS = ['C', 'D', 'E', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
     MIDDLE_COLUMNS = []
+    COMPRESSED_COLUMNS = []
 
 
 class PnlReportLayout1(DashboardLayout):
@@ -117,6 +123,7 @@ class PnlReportLayout1(DashboardLayout):
     CATEGORY_COLUMNS = ['B', 'H']
     NUMERIC_COLUMNS = ['C', 'D', 'E', 'F', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
     MIDDLE_COLUMNS = []
+    COMPRESSED_COLUMNS = []
 
 
 class WideDashboardLayout(DashboardLayout):
@@ -124,6 +131,7 @@ class WideDashboardLayout(DashboardLayout):
     CATEGORY_COLUMNS = ['B', 'F', 'J', 'N']
     MIDDLE_COLUMNS = ['E', 'I', 'M']
     NUMERIC_COLUMNS = ['C', 'D', 'G', 'H', 'K', 'L', 'O', 'P']
+    COMPRESSED_COLUMNS = []
 
 
 class WideDashboardLayout1(DashboardLayout):
@@ -132,6 +140,7 @@ class WideDashboardLayout1(DashboardLayout):
     CATEGORY_COLUMNS = ['B', 'G', 'L', 'Q']
     MIDDLE_COLUMNS = ['E', 'F', 'J', 'K', 'O', 'P']
     NUMERIC_COLUMNS = ['C', 'D', 'H', 'I', 'M', 'N', 'R', 'S']
+    COMPRESSED_COLUMNS = []
 
 
 class ExposureDashboardLayout(DashboardLayout):
@@ -139,20 +148,15 @@ class ExposureDashboardLayout(DashboardLayout):
     CATEGORY_COLUMNS = ['B', 'H', ]
     MIDDLE_COLUMNS = ['G', ]
     NUMERIC_COLUMNS = ['C', 'D', 'E', 'F', 'I', 'J', 'K', 'L', ]
+    COMPRESSED_COLUMNS = []
 
 
 class StressDashboardLayout(DashboardLayout):
     SIDE_COLUMNS = ['A', 'O', ]
     CATEGORY_COLUMNS = []
     MIDDLE_COLUMNS = []
-    NUMERIC_COLUMNS = ['B','C', 'D', 'E', 'F','G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
-
-
-class StressDashboardLayout1(DashboardLayout):
-    SIDE_COLUMNS = ['A', 'O', ]
-    CATEGORY_COLUMNS = ['B',]
-    MIDDLE_COLUMNS = []
-    NUMERIC_COLUMNS = ['C', 'D', 'E', 'F','G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
+    NUMERIC_COLUMNS = ['D', 'E', 'F','G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
+    COMPRESSED_COLUMNS = ['B','C']
 
 
 class PositionsDashboardLayout(DashboardLayout):
@@ -161,6 +165,7 @@ class PositionsDashboardLayout(DashboardLayout):
     MIDDLE_COLUMNS = []
     NUMERIC_COLUMNS = ['C', 'D', 'E', 'F',
                        'G', 'H', 'I', 'J', 'K', 'L', ]
+    COMPRESSED_COLUMNS = []
 
 
 class PositionsBreakdownDashboardLayout(DashboardLayout):
@@ -169,6 +174,7 @@ class PositionsBreakdownDashboardLayout(DashboardLayout):
     MIDDLE_COLUMNS = []
     NUMERIC_COLUMNS = ['D', 'E', 'F', 'G', 'H', 'I',
         'J', 'K', 'L', 'M', ]
+    COMPRESSED_COLUMNS = []
 
 
 class CorrelationDashboardLayout(DashboardLayout):
@@ -176,3 +182,4 @@ class CorrelationDashboardLayout(DashboardLayout):
     CATEGORY_COLUMNS = ['A', ]
     MIDDLE_COLUMNS = []
     NUMERIC_COLUMNS = []
+    COMPRESSED_COLUMNS = []

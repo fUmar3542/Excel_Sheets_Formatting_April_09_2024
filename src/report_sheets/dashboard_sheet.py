@@ -29,7 +29,7 @@ def generate_dashboard_sheet(
     date_obj = datetime.strptime(holdings_date, "%Y-%m-%d")
     # worksheet.set_default_row(30)
     insert_header(worksheet, styles, layout, fund, date_obj, title=title)
-    # worksheet.set_default_row(18)
+    # worksheet.set_default_row(21)
     report_tables = insert_dashboard_tables(data, styles, worksheet)
     _charts = insert_dashboard_charts(writer, layout, worksheet, report_tables, data=data, styles=styles)
     format_dashboard_worksheet(worksheet, layout)
@@ -215,7 +215,7 @@ def insert_dashboard_tables(data, styles, worksheet) -> Dict[str, ReportTable]:
         total_format=styles.get("table_total_pct"),
         snap_element=sector_exposure,
         snap_mode=SnapType.DOWN,
-        initial_position=(2000, 2000)
+        initial_position=(2100, 2100)
     )
     eu.insert_table(worksheet, sector_exposure)
     return_dict.update({table_name: sector_exposure})
@@ -227,7 +227,7 @@ def increase_size(worksheet_chart):
     num_rows = worksheet_chart.snap_element.data.shape[0]
     if num_rows < 4:
         num_rows = num_rows + 1
-    worksheet_chart.custom_height = (num_rows+1) * 20
+    worksheet_chart.custom_height = (num_rows+1) * 21
     return worksheet_chart
 
 
@@ -235,7 +235,7 @@ def increase_size_expose(worksheet_chart):
     num_rows = worksheet_chart.snap_element.shape[0]
     if num_rows < 4:
         num_rows = num_rows + 1
-    worksheet_chart.custom_height = (num_rows+1) * 20
+    worksheet_chart.custom_height = (num_rows+1) * 21
     return worksheet_chart
 
 
@@ -252,7 +252,7 @@ def insert_dashboard_charts(writer, layout, worksheet, report_tables, data, styl
         page_layout=layout,
         axis_format="percentage",
         custom_width=870,
-        # custom_height=200,
+        # custom_height=210,
         margin=1,
     )
     table_name = "sector_exposure_df1"
@@ -266,7 +266,7 @@ def insert_dashboard_charts(writer, layout, worksheet, report_tables, data, styl
         page_layout=layout,
         axis_format="percentage",
         custom_width=870,
-        # custom_height=200,
+        # custom_height=210,
         margin=1,
     )
 

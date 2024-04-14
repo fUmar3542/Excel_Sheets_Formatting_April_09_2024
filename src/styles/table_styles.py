@@ -1,6 +1,7 @@
 from typing import Any
 
 ALIGN_CENTER = 'center'
+VALIGN_CENTER = 'vcenter'
 DARK_BLUE_COLOR = '#44546A'
 WHIE_COLOR = '#FFFFFF'
 TABLE_HEADER_FILL_COLOR = '#44546A'
@@ -23,7 +24,8 @@ DATE_FORMAT = 'mm/dd/yy'
 def add_header_style(workbook, temp=None) -> Any:
     '''adds table style for a header for a given workbook'''
     style = workbook.add_format()
-    style.set_align(ALIGN_CENTER)
+    # style.set_align(ALIGN_CENTER)
+    style.set_valign(VALIGN_CENTER)
     style.set_bg_color(DARK_BLUE_COLOR)
     style.set_bold(True)
     style.set_font_name(TEXT_FONT)
@@ -39,6 +41,8 @@ def add_total_style(workbook) -> Any:
     '''adds table style for the total '''
     style = workbook.add_format()
     style.set_bold(True)
+    # style.set_align(ALIGN_CENTER)
+    style.set_valign(VALIGN_CENTER)
     #style.set_font_name(TEXT_FONT)
     #style.set_font_color(WHIE_COLOR)
     #style.set_size(TEXT_SIZE)
@@ -46,6 +50,7 @@ def add_total_style(workbook) -> Any:
     style.set_top(SOLID_BORDER_INDEX)
     style.set_bottom(SOLID_BORDER_INDEX)
     #style.set_border_color(DARK_BLUE_COLOR)
+
     return style
 
 
@@ -55,6 +60,8 @@ def add_total_pct_style(workbook) -> Any:
     style.set_bold(True)
     style.set_num_format(PERCENTAGE_FORMAT)
     style.set_font_name(TEXT_FONT)
+    # style.set_align(ALIGN_CENTER)
+    style.set_valign(VALIGN_CENTER)
     #style.set_font_color(WHIE_COLOR)
     style.set_size(TEXT_SIZE)
     #style.set_border(SOLID_BORDER_INDEX)
@@ -71,6 +78,8 @@ def add_table_body_format(workbook) -> Any:
     style.set_size(TEXT_SIZE)
     style.set_border(DASHED_BORDER_INDEX)
     style.set_border_color(DARK_BLUE_COLOR)
+    style.set_valign(VALIGN_CENTER)
+    # style.set_align(ALIGN_CENTER)
     return style
 
 
@@ -88,6 +97,7 @@ def add_body_frame_format(workbook) -> Any:
     style.set_right_color(DARK_BLUE_COLOR)
     style.set_font_name = TEXT_FONT
     style.set_size(TEXT_SIZE)
+    style.set_valign(VALIGN_CENTER)
 
 
 def add_merged_vertical(workbook) -> Any:
@@ -117,6 +127,16 @@ def _add_num_format(workbook, format) -> Any:
     style = workbook.add_format()
     style.set_num_format(format)
     style.set_border(DASHED_BORDER_INDEX)
+    style.set_valign(VALIGN_CENTER)
+    return style
+
+
+def my_value_format(workbook, format) -> Any:
+    '''adds number format'''
+
+    style = workbook.add_format()
+    style.set_border(DASHED_BORDER_INDEX)
+    style.set_valign(VALIGN_CENTER)
     return style
 
 

@@ -15,6 +15,9 @@ def format_dashboard_worksheet(worksheet, layout) -> None:
     for col in layout.MIDDLE_COLUMNS:
         worksheet.set_column(f'{col}:{col}', layout.MIDDLE_COLUMNS_WIDTH)
 
+    for col in layout.COMPRESSED_COLUMNS:
+        worksheet.set_column(f'{col}:{col}', layout.COMPRESSED_COLUMNS_WIDTH)
+
     worksheet.set_zoom(100)
     worksheet.hide_gridlines(2)
     worksheet.repeat_rows(0, 4)

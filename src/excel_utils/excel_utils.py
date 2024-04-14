@@ -11,6 +11,7 @@ from src.excel_utils.chart_series_setters import SERIES_SETTERS, _add_series
 from src.report_items.report_table import ReportTable
 from src.report_items.worksheet_chart import WorksheetChart
 from src.styles.styles_init import FORMATS
+import numpy as np
 
 
 def insert_text(worksheet, table, text) -> None:
@@ -112,6 +113,8 @@ def insert_table(
                 crow = list(report_table.data.iloc[:,0]).index(f[0])+1
                 val = report_table.data.iloc[crow-1,cnum]
                 worksheet.write(start_row + crow,start_col + cnum, val, f[2])
+
+
         
 def apply_conditional_formatting(
     worksheet,
