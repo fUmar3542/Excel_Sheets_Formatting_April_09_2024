@@ -111,6 +111,12 @@ class PnlReportLayout(DashboardLayout):
     NUMERIC_COLUMNS = ['C', 'D', 'E', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
     MIDDLE_COLUMNS = []
 
+class PnlReportLayout1(DashboardLayout):
+    SIDE_COLUMNS = ['A', 'P']
+    CATEGORY_COLUMNS = ['B', 'H']
+    NUMERIC_COLUMNS = ['C', 'D', 'E', 'F', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+    MIDDLE_COLUMNS = []
+
 
 class WideDashboardLayout(DashboardLayout):
     '''contains 4 category columns'''

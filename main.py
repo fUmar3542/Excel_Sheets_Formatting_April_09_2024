@@ -89,8 +89,8 @@ def change_analyst_exposure(df1, df2):
     finally:
         return df1, df2
 
-if __name__ == "__main__": #Execution of main procedure for laumch in command line 
 
+if __name__ == "__main__": #Execution of main procedure for laumch in command line
 
     # Load global variables and file paths from YAML
     ANNUALIZATION_FACTOR = config.global_settings.get("annualization_factor", 252)

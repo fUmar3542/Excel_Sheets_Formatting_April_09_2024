@@ -7,7 +7,7 @@ import src.excel_utils.excel_utils as eu
 from src.excel_utils.header import insert_header
 from src.excel_utils.set_up_workbook import set_up_workbook
 from src.excel_utils.sheet_format import format_dashboard_worksheet
-from src.layouts.layouts import DashboardLayout, PnlReportLayout
+from src.layouts.layouts import DashboardLayout, PnlReportLayout, PnlReportLayout1
 
 from ..report_items.report_table import ReportTable
 from ..report_items.snap_operations import SnapType
@@ -29,7 +29,7 @@ def generate_pnlreport_sheet(
     FirmName) -> None:
     """generates pnl report sheet"""
 
-    layout = PnlReportLayout()     #DashboardLayout()
+    layout = PnlReportLayout1()     #DashboardLayout()
     styles, worksheet = set_up_workbook(writer, sheet_name=PNLDATA_SHEET_NAME, temp="PNL")
     date_obj = datetime.strptime(holdings_date, "%Y-%m-%d")
     insert_header(worksheet, styles, layout, holdings_date=date_obj, fund=fund, title=title)
