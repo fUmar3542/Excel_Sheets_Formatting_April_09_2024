@@ -17,7 +17,7 @@ def set_up_workbook(workbook, sheet_name: str, temp=None):
         workbook.add_worksheet(sheet_name)
 
     worksheet = workbook.get_worksheet_by_name(sheet_name)
-    worksheet.set_default_row(18)
+    worksheet.set_default_row(15)
     worksheet.set_zoom(100)
 
     return styles, worksheet

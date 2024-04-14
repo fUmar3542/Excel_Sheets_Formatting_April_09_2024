@@ -19,7 +19,7 @@ def increase_size(worksheet_chart):
     num_rows = worksheet_chart.snap_element.data.shape[0]
     if num_rows < 4:
         num_rows = num_rows + 1
-    worksheet_chart.custom_height = (num_rows+1) * 24
+    worksheet_chart.custom_height = (num_rows+1) * 20
     return worksheet_chart
 
 

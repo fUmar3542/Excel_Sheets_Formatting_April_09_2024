@@ -10,11 +10,9 @@ from ..report_items.report_table import ReportTable
 from ..report_items.snap_operations import SnapType
 from ..report_items.worksheet_chart import WorksheetChart, WorksheetChart3, WorksheetChart2, WorksheetChart4
 from datetime import datetime
-import pandas as pd
+
 
 SHEET_NAME = "Dashboard"
-
-hidden = ()
 
 
 def generate_dashboard_sheet(
@@ -229,7 +227,7 @@ def increase_size(worksheet_chart):
     num_rows = worksheet_chart.snap_element.data.shape[0]
     if num_rows < 4:
         num_rows = num_rows + 1
-    worksheet_chart.custom_height = (num_rows+1) * 24
+    worksheet_chart.custom_height = (num_rows+1) * 20
     return worksheet_chart
 
 
@@ -237,7 +235,7 @@ def increase_size_expose(worksheet_chart):
     num_rows = worksheet_chart.snap_element.shape[0]
     if num_rows < 4:
         num_rows = num_rows + 1
-    worksheet_chart.custom_height = (num_rows+1) * 24
+    worksheet_chart.custom_height = (num_rows+1) * 20
     return worksheet_chart
 
 
@@ -254,7 +252,7 @@ def insert_dashboard_charts(writer, layout, worksheet, report_tables, data, styl
         page_layout=layout,
         axis_format="percentage",
         custom_width=870,
-        # custom_height=210,
+        # custom_height=200,
         margin=1,
     )
     table_name = "sector_exposure_df1"
@@ -268,7 +266,7 @@ def insert_dashboard_charts(writer, layout, worksheet, report_tables, data, styl
         page_layout=layout,
         axis_format="percentage",
         custom_width=870,
-        # custom_height=210,
+        # custom_height=200,
         margin=1,
     )
 

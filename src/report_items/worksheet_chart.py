@@ -27,7 +27,7 @@ class WorksheetChart(ReportItem):
     columns: Optional[List[str]] = None
     categories_name: str = 'Some table'
     page_layout: Optional[Any] = None
-    initial_rows: int = 18
+    initial_rows: int = 15
     title: str = None  # type: ignore
     stacked: bool = True
     axis_format: str = 'float'
@@ -62,7 +62,7 @@ class WorksheetChart2(ReportItem):
     columns: Optional[List[str]] = None
     categories_name: str = 'Some table'
     page_layout: Optional[Any] = None
-    initial_rows: int = 18
+    initial_rows: int = 15
     title: str = None  # type: ignore
     stacked: bool = True
     axis_format: str = 'float'
@@ -83,7 +83,7 @@ class WorksheetChart2(ReportItem):
             height = self.page_layout.pixels_to_bottom(self.initial_rows)
         else:
             # Calculation based on the snap item
-            height = 18
+            height = 15
             if self.snap_element:
                 height = self.page_layout.pixels_to_bottom(len(self.snap_element.data) + 1)
 
@@ -95,7 +95,7 @@ class WorksheetChart3(ReportItem):
     columns: Optional[List[str]] = None
     categories_name: str = 'Some table'
     page_layout: Optional[Any] = None
-    initial_rows: int = 18
+    initial_rows: int = 15
     title: str = None  # type: ignore
     stacked: bool = True
     axis_format: str = 'float'
@@ -136,7 +136,7 @@ class WorksheetChart4(ReportItem):
     columns: Optional[List[str]] = None
     categories_name: str = 'Some table'
     page_layout: Optional[Any] = None
-    initial_rows: int = 18
+    initial_rows: int = 15
     title: str = None  # type: ignore
     stacked: bool = True
     axis_format: str = 'percentage'
@@ -155,7 +155,7 @@ class WorksheetChart4(ReportItem):
                 height = self.page_layout.pixels_to_bottom(self.initial_rows)
             else:
                 # Calculation based on the snap item
-                height = 18
+                height = 15
                 if self.snap_element:
                     height = self.page_layout.pixels_to_bottom(len(self.snap_element.data) + 1)
         else:

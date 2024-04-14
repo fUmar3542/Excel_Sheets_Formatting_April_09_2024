@@ -141,7 +141,7 @@ def generate_pnlreport_sheet(
         title="Rolling 20 Day Volatility vs. Rolling 1 Year Volatility",
         axis_format="percentage",
         page_layout=layout,
-        initial_rows=24,
+        initial_rows=20,
     )
     eu.insert_chart(
         writer,

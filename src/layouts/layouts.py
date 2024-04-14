@@ -111,6 +111,7 @@ class PnlReportLayout(DashboardLayout):
     NUMERIC_COLUMNS = ['C', 'D', 'E', 'G', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
     MIDDLE_COLUMNS = []
 
+
 class PnlReportLayout1(DashboardLayout):
     SIDE_COLUMNS = ['A', 'P']
     CATEGORY_COLUMNS = ['B', 'H']
@@ -153,6 +154,7 @@ class StressDashboardLayout1(DashboardLayout):
     MIDDLE_COLUMNS = []
     NUMERIC_COLUMNS = ['C', 'D', 'E', 'F','G', 'H', 'I', 'J', 'K', 'L', 'M', 'N']
 
+
 class PositionsDashboardLayout(DashboardLayout):
     SIDE_COLUMNS = ['A', ]
     CATEGORY_COLUMNS = ['B', ]
@@ -167,6 +169,7 @@ class PositionsBreakdownDashboardLayout(DashboardLayout):
     MIDDLE_COLUMNS = []
     NUMERIC_COLUMNS = ['D', 'E', 'F', 'G', 'H', 'I',
         'J', 'K', 'L', 'M', ]
+
 
 class CorrelationDashboardLayout(DashboardLayout):
     SIDE_COLUMNS = []
