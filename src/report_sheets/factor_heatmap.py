@@ -4,6 +4,8 @@ import pandas as pd
 
 import src.excel_utils.excel_utils as eu
 from src.excel_utils.set_up_workbook import set_up_workbook
+from src.layouts.layouts import CorrelationDashboardLayout
+from src.excel_utils.sheet_format import format_dashboard_worksheet
 
 from ..report_items.report_table import ReportTable
 
@@ -14,7 +16,7 @@ def generate_factor_heatmap_sheet(writer, data_dict: Dict[str, pd.DataFrame]) ->
     '''generates a heatmap sheet'''
 
     styles, worksheet = set_up_workbook(writer, sheet_name=PNLDATA_SHEET_NAME)
-
+    layout = CorrelationDashboardLayout()     #DashboardLayout()
     factor_heatmap = ReportTable(
         initial_position=(0, 0),
         data=data_dict.get('factor_heatmap'),  # type: ignore
@@ -26,3 +28,4 @@ def generate_factor_heatmap_sheet(writer, data_dict: Dict[str, pd.DataFrame]) ->
 
     eu.insert_table(worksheet, factor_heatmap)
     eu.apply_conditional_formatting(worksheet, factor_heatmap)
+    format_dashboard_worksheet(worksheet, layout)
