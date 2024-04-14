@@ -63,12 +63,15 @@ def generate_exp_report_sheet(
         title=first_row_tableid1,
         categories_name=first_row_tableid1,
         axis_format="percentage",
-        custom_height=330,
+        custom_height=400,
         margin=2,
-        custom_padding=1,
+        custom_padding=0,
     )
     report_charts.append(firstrow_chart)
-    
+
+    # temp = False
+    # value = 2
+    table = None
     ancor_element = report_tables[0]
     for row in data[first_idx+1:]:
         if len(row[list(row.keys())[0]])>1:
@@ -82,6 +85,16 @@ def generate_exp_report_sheet(
                 right_table=list(row.values())[1],
                 chart_columns=["Long", "Short"],
             )
+            if row_chart.table_name == 'sector_exposure':
+                table = row_tables[0]
+            # if temp:
+            #     row_tables[0].position = (row_tables[0].position[0], row_tables[0].position[1]+value)
+            #     row_tables[1].position = (row_tables[1].position[0], row_tables[1].position[1]+value)
+            #     value = value + 2
+            # if row_chart.table_name == 'sector_exposure':
+            #     temp = True
+            # # if temp:
+            # #     row_chart.position = (row_chart.position[0], row_chart.position[1]+value)
             ancor_element = row_tables[0]
             report_tables.extend(row_tables)
             report_charts.append(row_chart)

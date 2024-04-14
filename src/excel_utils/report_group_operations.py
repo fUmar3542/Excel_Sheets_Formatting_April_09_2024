@@ -169,7 +169,7 @@ def init_2_table_row_with_chart(
     left_table_report = ReportTable(
         snap_element=global_snap_to,
         snap_mode=SnapType.DOWN,
-        margin=18,
+        margin=22,
         data=left_table,
         table_name=re.sub(r'\W', '_', left_name.lower()),
         values_format=styles.get('percentage'),
@@ -186,16 +186,17 @@ def init_2_table_row_with_chart(
         header_format=styles.get("table_header"),
         total_format=styles.get("table_total_pct"),
     )
-    chart = WorksheetChart4(
-        snap_element=left_table_report,
-        snap_mode=SnapType.DOWN,
-        initial_rows=15,
-        table_name=re.sub(r'\W', '_', left_name.lower()),
-        columns=chart_columns,
-        categories_name=left_name,
-        page_layout=layout,
-        axis_format='percentage',
-    )
+    if True:
+        chart = WorksheetChart4(
+            snap_element=left_table_report,
+            snap_mode=SnapType.DOWN,
+            initial_rows=20,
+            table_name=re.sub(r'\W', '_', left_name.lower()),
+            columns=chart_columns,
+            categories_name=left_name,
+            page_layout=layout,
+            axis_format='percentage',
+        )
     return [left_table_report, right_table_report], chart
 
 
