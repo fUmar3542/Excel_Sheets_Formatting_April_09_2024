@@ -15,7 +15,7 @@ import xlsxwriter
 from src.handles.exception_handling import MyExceptions
 
 # Global use of YAML file
-yaml_file = f"CRM.yml"
+yaml_file = f"1623 Capital.yml"
 if os.path.exists(yaml_file):
     with open(yaml_file, 'r') as file:
         config_data = yaml.safe_load(file)
@@ -23,7 +23,7 @@ if os.path.exists(yaml_file):
         global_settings = config_data.get("global_settings", {})
         fund_settings = config_data.get("funds", {})
 else:
-    print(f"YAML file '{yaml_file}' not found.")
+    MyExceptions.show_message(tab='main.py', message="Configuration .yml file not found on the specified path")
     sys.exit(1)
 
 # Export global and fund variables to config module
@@ -243,7 +243,7 @@ def read_and_process_factor_prices_position(investment_advisor, holdings_date):
         price.set_index(["date"], inplace=True)
 
         # read and process raw positions ------------------------------------
-        # # read and process positions
+        # read and process positions
         position = pd.read_csv(file_paths["positions"].format(investment_advisor=investment_advisor,
                                                               holdings_date=pd.to_datetime(holdings_date).strftime(
                                                                   '%Y%m%d')))
@@ -319,7 +319,7 @@ def read_and_process_factor_prices_position(investment_advisor, holdings_date):
             "MarketCap_Group": mcap_filters,
         }
 
-        # check yaml file for custom outputs``
+        # check yaml file for custom outputs
         if "analyst_exposure" in custom_outputs:
             filters_dict["Analyst"] = position["Analyst"].unique()
         if "type_exposure" in custom_outputs:
@@ -473,7 +473,7 @@ def apply_filters_to_input_data(fund, AUM_dict, AUM_clean_df, factor, factor_pri
             position, factor_betas, factor_prices, factor, matrix_cov, AUM_dict, fund
         )
         # Excel equivalent ["FactorExposures"; "Top10" tbls & "Bottom10"
-        # tbls by Factor, Exposure by Position]
+        # tbls by Factor, Exposure vy Position]
         (
             risk_factor_exposure_top_N_list,
             risk_factor_exposure_bottom_N_list,
@@ -772,263 +772,310 @@ if __name__ == "__main__":  # Execution of main procedure for laumch in command 
                     "Bonds": "Bond Market Index",
                     "Telecom": "Communication Services"
                 }
-                # Apply the mapping to the index of the DataFrame
-                sector_factor_decomp_df.index = sector_factor_decomp_df.index.to_series().replace(value_mapping,
-                                                                                                  regex=True)
-                title = "Risk Report"
-                rsh.generate_dashboard_sheet(
-                    writer,
-                    fund,
-                    holdings_date,
-                    title,
-                    data={
-                        "var_structured_position_top10": top_var_withexpo,  # top_var_contributors,
-                        "var_structured_position_bottom10": top_vardiv_withexpo,  # top_var_diversifiers,
-                        "sector_exposure_df": sector_exposure_df,
-                        "options_premium_df": options_premium_df,
-                        "greek_sensitivities_df": greek_sensitivities_df.sort_index(),
-                        "macro_factor_decomp_df": macro_factor_decomp_df,  # type: ignore
-                        "sector_factor_decomp_df": sector_factor_decomp_df,
-                        "fund_exp_pct_dashboard": fund_exp_pct_dashboard,
-                        "fund_exp_usd_dashboard": fund_exp_usd_dashboard,
-                        "position_liquidity": position_liquidity,
-                    },
-                    nm=INVESTTMENT,
-                )
+                try:
+                    # Apply the mapping to the index of the DataFrame
+                    sector_factor_decomp_df.index = sector_factor_decomp_df.index.to_series().replace(value_mapping,
+                                                                                                      regex=True)
+                    title = "Risk Report"
+                    rsh.generate_dashboard_sheet(
+                        writer,
+                        fund,
+                        holdings_date,
+                        title,
+                        data={
+                            "var_structured_position_top10": top_var_withexpo,  # top_var_contributors,
+                            "var_structured_position_bottom10": top_vardiv_withexpo,  # top_var_diversifiers,
+                            "sector_exposure_df": sector_exposure_df,
+                            "options_premium_df": options_premium_df,
+                            "greek_sensitivities_df": greek_sensitivities_df.sort_index(),
+                            "macro_factor_decomp_df": macro_factor_decomp_df,  # type: ignore
+                            "sector_factor_decomp_df": sector_factor_decomp_df,
+                            "fund_exp_pct_dashboard": fund_exp_pct_dashboard,
+                            "fund_exp_usd_dashboard": fund_exp_usd_dashboard,
+                            "position_liquidity": position_liquidity,
+                        },
+                        nm=INVESTTMENT,
+                    )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating dashboard sheet\n\n" + str(ex))
 
-                if not options_premium_df.empty:
-                    options_premium_df.set_index("Premium", inplace=True)
+                try:
+                    if not options_premium_df.empty:
+                        options_premium_df.set_index("Premium", inplace=True)
 
-                # 1.h., build rest of workbook beyond dashboard
-                # Excel equivalents ["PNLReport"]
-                AUM_clean_df = pnl_stats.clean_nav_extra_filter(AUM_clean_df)
-                return_analysis_stats = pnl_stats.return_analysis(AUM_clean_df, holdings_date, investment_advisor)
+                    # 1.h., build rest of workbook beyond dashboard
+                    # Excel equivalents ["PNLReport"]
+                    AUM_clean_df = pnl_stats.clean_nav_extra_filter(AUM_clean_df)
+                    return_analysis_stats = pnl_stats.return_analysis(AUM_clean_df, holdings_date, investment_advisor)
 
-                comparative_analysis_stats = pnl_stats.comparative_statistics(
-                    AUM_clean_df, return_analysis_stats, holdings_date, investment_advisor)
+                    comparative_analysis_stats = pnl_stats.comparative_statistics(
+                        AUM_clean_df, return_analysis_stats, holdings_date, investment_advisor)
 
-                rsh.generate_pnldata_sheet(
-                    writer,
-                    ANNUALIZATION_FACTOR,
-                    data_dict={
-                        "AUM_clean": AUM_clean_df.dropna(),
-                    },
-                )
+                    rsh.generate_pnldata_sheet(
+                        writer,
+                        ANNUALIZATION_FACTOR,
+                        data_dict={
+                            "AUM_clean": AUM_clean_df.dropna(),
+                        },
+                    )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating PNL data sheet\n\n" + str(ex))
 
-                perf_ratio_stats = return_analysis_stats.loc[
-                    (return_analysis_stats.index.str.contains("Up Days"))
-                    | (return_analysis_stats.index.str.contains("Down Days"))
-                    | (return_analysis_stats.index.str.contains("Sharpe"))
-                    | (return_analysis_stats.index.str.contains("Sortino"))
-                    | (return_analysis_stats.index.str.contains("CALMAR"))
-                    ]
-                return_analysis_stats = return_analysis_stats.loc[
-                    ~(return_analysis_stats.index.str.contains("Up Days"))
-                    & ~(return_analysis_stats.index.str.contains("Down Days"))
-                    & ~(return_analysis_stats.index.str.contains("Sharpe"))
-                    & ~(return_analysis_stats.index.str.contains("Sortino"))
-                    & ~(return_analysis_stats.index.str.contains("CALMAR"))
-                    ]
+                try:
+                    perf_ratio_stats = return_analysis_stats.loc[
+                        (return_analysis_stats.index.str.contains("Up Days"))
+                        | (return_analysis_stats.index.str.contains("Down Days"))
+                        | (return_analysis_stats.index.str.contains("Sharpe"))
+                        | (return_analysis_stats.index.str.contains("Sortino"))
+                        | (return_analysis_stats.index.str.contains("CALMAR"))
+                        ]
+                    return_analysis_stats = return_analysis_stats.loc[
+                        ~(return_analysis_stats.index.str.contains("Up Days"))
+                        & ~(return_analysis_stats.index.str.contains("Down Days"))
+                        & ~(return_analysis_stats.index.str.contains("Sharpe"))
+                        & ~(return_analysis_stats.index.str.contains("Sortino"))
+                        & ~(return_analysis_stats.index.str.contains("CALMAR"))
+                        ]
 
-                monthly_pnl_stats = pnl_stats.monthly_pnl_stats(AUM_clean_df)
-                fund_AUM = pd.DataFrame(AUM_clean_df[['EndBookNAV', 'DailyBookPL']].loc[holdings_date, :]).rename(
-                    index={'EndBookNAV': 'AUM', 'DailyBookPL': 'Daily P&L'}).reset_index()
-                fund_AUM.rename(columns={'index': 'Fund $', fund_AUM.columns[1]: 'Fund'}, inplace=True)
-                fund_AUM.set_index('Fund $', inplace=True)
-                title = "Risk Report"
-                rsh.generate_pnlreport_sheet(
-                    writer,
-                    fund,
-                    holdings_date,
-                    title,
-                    data_dict={
-                        "comparative_analysis_stats": comparative_analysis_stats,
-                        "return_analysis_stats": return_analysis_stats,
-                        "perf_ratio_stats": perf_ratio_stats,
-                        "monthly_pnl_stats": monthly_pnl_stats,
-                        "fund_AUM": fund_AUM, },
-                    FirmName=investment_advisor,
-                )
-                rsh.generate_factor_heatmap_sheet(
-                    writer,
-                    data_dict={
-                        "factor_heatmap": factor_heat_map[["Exposure", "Beta"] + FACTORS_TO_REPORT[1:]].sort_values(
-                            "Exposure", ascending=False),
-                    },
-                )
-
-                if "betaheatmap" in custom_outputs:
-                    rsh.generate_beta_heatmap_sheet(
+                    monthly_pnl_stats = pnl_stats.monthly_pnl_stats(AUM_clean_df)
+                    fund_AUM = pd.DataFrame(AUM_clean_df[['EndBookNAV', 'DailyBookPL']].loc[holdings_date, :]).rename(
+                        index={'EndBookNAV': 'AUM', 'DailyBookPL': 'Daily P&L'}).reset_index()
+                    fund_AUM.rename(columns={'index': 'Fund $', fund_AUM.columns[1]: 'Fund'}, inplace=True)
+                    fund_AUM.set_index('Fund $', inplace=True)
+                    title = "Risk Report"
+                    rsh.generate_pnlreport_sheet(
+                        writer,
+                        fund,
+                        holdings_date,
+                        title,
+                        data_dict={
+                            "comparative_analysis_stats": comparative_analysis_stats,
+                            "return_analysis_stats": return_analysis_stats,
+                            "perf_ratio_stats": perf_ratio_stats,
+                            "monthly_pnl_stats": monthly_pnl_stats,
+                            "fund_AUM": fund_AUM, },
+                        FirmName=investment_advisor,
+                    )
+                    rsh.generate_factor_heatmap_sheet(
                         writer,
                         data_dict={
-                            "beta_heatmap": beta_heat_map[["Exposure", "Beta"] + FACTORS_TO_REPORT[1:]].sort_values(
+                            "factor_heatmap": factor_heat_map[["Exposure", "Beta"] + FACTORS_TO_REPORT[1:]].sort_values(
                                 "Exposure", ascending=False),
                         },
                     )
-                title = INVESTTMENT + " Factor Sensitivity Contributors"
-                rsh.generate_factor_exposures_sheet(
-                    writer,
-                    fund,
-                    holdings_date,
-                    title,
-                    data={
-                        "macro_factor_decomp_df": macro_factor_decomp_df,
-                        "sector_factor_decomp_df": sector_factor_decomp_df,
-                        "risk_factor_exposure_top_n_list": risk_factor_exposure_top_N_list,
-                        "risk_factor_exposure_bottom_n_list": risk_factor_exposure_bottom_N_list,
-                    },
-                )
-                if "beta_exposures_sheet" in custom_outputs:
-                    title = INVESTTMENT + " Beta Sensitivity Contributors"
-                    rsh.generate_beta_exposures_sheet(
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating PNL Report/Factor heatmap sheet\n\n" + str(ex))
+
+                try:
+                    if "betaheatmap" in custom_outputs:
+                        rsh.generate_beta_heatmap_sheet(
+                            writer,
+                            data_dict={
+                                "beta_heatmap": beta_heat_map[["Exposure", "Beta"] + FACTORS_TO_REPORT[1:]].sort_values(
+                                    "Exposure", ascending=False),
+                            },
+                        )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating Beta heatmap sheet\n\n" + str(ex))
+
+                try:
+                    title = INVESTTMENT + " Factor Sensitivity Contributors"
+                    rsh.generate_factor_exposures_sheet(
                         writer,
                         fund,
                         holdings_date,
                         title,
                         data={
-                            "macro_beta_decomp_df": macro_beta_decomp_df,
-                            "sector_beta_decomp_df": sector_beta_decomp_df,
-                            "risk_beta_exposure_top_n_list": risk_beta_exposure_top_N_list,
-                            "risk_beta_exposure_bottom_n_list": risk_beta_exposure_bottom_N_list,
+                            "macro_factor_decomp_df": macro_factor_decomp_df,
+                            "sector_factor_decomp_df": sector_factor_decomp_df,
+                            "risk_factor_exposure_top_n_list": risk_factor_exposure_top_N_list,
+                            "risk_factor_exposure_bottom_n_list": risk_factor_exposure_bottom_N_list,
                         },
                     )
-                if INVESTTMENT == "CRM":
-                    try:
-                        values = {}
-                        for x in analyst_exposure_df.index.values:
-                            if '_' in x:
-                                values[x] = x.split("_")[-1].upper()
-                        analyst_exposure_df.index = analyst_exposure_df.index.to_series().replace(values, regex=True)
-                        values = {}
-                        for x in analyst_beta_adj_exposure_df.index.values:
-                            if '_' in x:
-                                values[x] = x.split("_")[-1].upper()
-                        analyst_beta_adj_exposure_df.index = analyst_beta_adj_exposure_df.index.to_series().replace(
-                            values, regex=True)
-                    except:
-                        pass
-                title = INVESTTMENT + " Exposure Report"
-                rsh.generate_exp_report_sheet(
-                    writer,
-                    fund,
-                    holdings_date,
-                    title,
-                    data=[
-                        {
-                            "Strategy exposure": strat_exposure_df,
-                            "Strategy Beta Exposure": strat_beta_adj_exposure_df,
-                        },
-                        {
-                            "Analyst Exposure": analyst_exposure_df,
-                            "Analyst Beta Exposure": analyst_beta_adj_exposure_df,
-                        },
-                        {
-                            "AssetType Exposure": assettype_exposure_df,
-                            "AssetType Beta Exposure": assettype_beta_adj_exposure_df,
-                        },
-                        {
-                            "Sector Exposure": sector_exposure_df,
-                            "Sector Beta Exposure": sector_beta_adj_exposure_df,
-                        },
-                        {
-                            "Industry Exposure": industry_exposure_df,
-                            "Industry Beta Exposure": industry_beta_adj_exposure_df,
-                        },
-                        {
-                            "Country Exposure": country_exposure_df,
-                            "Country Beta Exposure": country_beta_adj_exposure_df,
-                        },
-                        {
-                            "Market Cap Exposure": mktcap_exposure_df,
-                            "Market Cap Beta Exposure": mktcap_beta_adj_exposure_df,
-                        },
-                    ],
-                )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating Factor Exposure sheet\n\n" + str(ex))
 
-                title = INVESTTMENT + " VaR Report"
-                rsh.generate_var_report_sheet(
-                    writer,
-                    fund,
-                    holdings_date,
-                    title,
-                    data=[
-                        {
-                            "var_top10": top_var_contributors,
-                            "var_bottom10": top_var_diversifiers,
-                        },
-                        {
-                            "Analyst VaR": None if var_structured_analyst is None else var_structured_analyst.fillna(0),
-                            "Asset Type VaR": None if var_structured_assettype is None else var_structured_assettype.fillna(
-                                0),
-                            "Strat VaR": var_structured_strat.fillna(0),
-                            "Sector VaR": var_structured_sector.fillna(0),
-                            "Industry VaR": var_structured_industry.fillna(0),
-                            "Country VaR": var_structured_country.fillna(0),
-                            "MarketCap VaR": var_structured_mcap.fillna(0),
-                        },
-                    ],
-                )
-                title = INVESTTMENT + " Options Analysis & Stress Tests"
-                rsh.generate_options_stress_sheet(
-                    writer,
-                    fund,
-                    holdings_date,
-                    title,
-                    data=[
-                        {
-                            'options_delta_adj_exposure_df': options_delta_adj_exposure_df,
-                            'options_delta1_exposure_df': options_delta1_exposure_df,
-                            'greek_sensitivities_df': greek_sensitivities_df,
-                            'options_premium_df': options_premium_df,
-                        },
-                        {
-                            'stress_test_price_vol_results_df':
-                                stress_test_price_vol_results_df,
-                            'stress_test_beta_price_vol_results_df':
-                                stress_test_beta_price_vol_results_df,
-                            'stress_test_price_vol_exposure_results_df':
-                                stress_test_price_vol_exposure_results_df,
-                        },
-                        {
-                            "stress_test_filtered_df": stress_test_filtered_df,
-                        }
-                    ],
-                    nm=INVESTTMENT
-                )
+                try:
+                    if "beta_exposures_sheet" in custom_outputs:
+                        title = INVESTTMENT + " Beta Sensitivity Contributors"
+                        rsh.generate_beta_exposures_sheet(
+                            writer,
+                            fund,
+                            holdings_date,
+                            title,
+                            data={
+                                "macro_beta_decomp_df": macro_beta_decomp_df,
+                                "sector_beta_decomp_df": sector_beta_decomp_df,
+                                "risk_beta_exposure_top_n_list": risk_beta_exposure_top_N_list,
+                                "risk_beta_exposure_bottom_n_list": risk_beta_exposure_bottom_N_list,
+                            },
+                        )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating Beta Exposure sheet\n\n" + str(ex))
 
-                title = INVESTTMENT + " Delta Report"
-                if "generate_delta_sheet" in custom_outputs:
-                    rsh.generate_option_delta_sheet(
+                try:
+                    if INVESTTMENT == "CRM":
+                        try:
+                            values = {}
+                            for x in analyst_exposure_df.index.values:
+                                if '_' in x:
+                                    values[x] = x.split("_")[-1].upper()
+                            analyst_exposure_df.index = analyst_exposure_df.index.to_series().replace(values, regex=True)
+                            values = {}
+                            for x in analyst_beta_adj_exposure_df.index.values:
+                                if '_' in x:
+                                    values[x] = x.split("_")[-1].upper()
+                            analyst_beta_adj_exposure_df.index = analyst_beta_adj_exposure_df.index.to_series().replace(
+                                values, regex=True)
+                        except:
+                            pass
+                    title = INVESTTMENT + " Exposure Report"
+                    rsh.generate_exp_report_sheet(
                         writer,
                         fund,
                         holdings_date,
                         title,
-                        data={
-                            "options_delta": options_delta_df,
-                        },
+                        data=[
+                            {
+                                "Strategy exposure": strat_exposure_df,
+                                "Strategy Beta Exposure": strat_beta_adj_exposure_df,
+                            },
+                            {
+                                "Analyst Exposure": analyst_exposure_df,
+                                "Analyst Beta Exposure": analyst_beta_adj_exposure_df,
+                            },
+                            {
+                                "AssetType Exposure": assettype_exposure_df,
+                                "AssetType Beta Exposure": assettype_beta_adj_exposure_df,
+                            },
+                            {
+                                "Sector Exposure": sector_exposure_df,
+                                "Sector Beta Exposure": sector_beta_adj_exposure_df,
+                            },
+                            {
+                                "Industry Exposure": industry_exposure_df,
+                                "Industry Beta Exposure": industry_beta_adj_exposure_df,
+                            },
+                            {
+                                "Country Exposure": country_exposure_df,
+                                "Country Beta Exposure": country_beta_adj_exposure_df,
+                            },
+                            {
+                                "Market Cap Exposure": mktcap_exposure_df,
+                                "Market Cap Beta Exposure": mktcap_beta_adj_exposure_df,
+                            },
+                        ],
                     )
-                title = INVESTTMENT + " Position Report"
-                rsh.generate_positions_summary_sheet(
-                    writer,
-                    fund,
-                    holdings_date,
-                    title,
-                    position_summary,
-                )
-                title = INVESTTMENT + " Position Breakdown Report"
-                rsh.generate_positions_breakdown_sheet(
-                    writer,
-                    fund,
-                    holdings_date,
-                    title,
-                    position_breakdown.sort_values('Exposure', ascending=False).fillna(0),
-                )
-                title = INVESTTMENT + " Factor Correlation Report"
-                matrix_correlation.index.name = 'Factor Correlations'
-                rsh.generate_factor_correlations_sheet(
-                    writer,
-                    matrix_correlation,
-                )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message=f"Following exception occurred during generating {INVESTTMENT} Exposure report\n\n" + str(ex))
+
+                try:
+                    title = INVESTTMENT + " VaR Report"
+                    rsh.generate_var_report_sheet(
+                        writer,
+                        fund,
+                        holdings_date,
+                        title,
+                        data=[
+                            {
+                                "var_top10": top_var_contributors,
+                                "var_bottom10": top_var_diversifiers,
+                            },
+                            {
+                                "Analyst VaR": None if var_structured_analyst is None else var_structured_analyst.fillna(0),
+                                "Asset Type VaR": None if var_structured_assettype is None else var_structured_assettype.fillna(
+                                    0),
+                                "Strat VaR": var_structured_strat.fillna(0),
+                                "Sector VaR": var_structured_sector.fillna(0),
+                                "Industry VaR": var_structured_industry.fillna(0),
+                                "Country VaR": var_structured_country.fillna(0),
+                                "MarketCap VaR": var_structured_mcap.fillna(0),
+                            },
+                        ],
+                    )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating VaR report\n\n" + str(ex))
+
+                try:
+                    title = INVESTTMENT + " Options Analysis & Stress Tests"
+                    rsh.generate_options_stress_sheet(
+                        writer,
+                        fund,
+                        holdings_date,
+                        title,
+                        data=[
+                            {
+                                'options_delta_adj_exposure_df': options_delta_adj_exposure_df,
+                                'options_delta1_exposure_df': options_delta1_exposure_df,
+                                'greek_sensitivities_df': greek_sensitivities_df,
+                                'options_premium_df': options_premium_df,
+                            },
+                            {
+                                'stress_test_price_vol_results_df':
+                                    stress_test_price_vol_results_df,
+                                'stress_test_beta_price_vol_results_df':
+                                    stress_test_beta_price_vol_results_df,
+                                'stress_test_price_vol_exposure_results_df':
+                                    stress_test_price_vol_exposure_results_df,
+                            },
+                            {
+                                "stress_test_filtered_df": stress_test_filtered_df,
+                            }
+                        ],
+                        nm=INVESTTMENT
+                    )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating Options stress sheet\n\n" + str(ex))
+
+                try:
+                    title = INVESTTMENT + " Delta Report"
+                    if "generate_delta_sheet" in custom_outputs:
+                        rsh.generate_option_delta_sheet(
+                            writer,
+                            fund,
+                            holdings_date,
+                            title,
+                            data={
+                                "options_delta": options_delta_df,
+                            },
+                        )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating Delta report sheet\n\n" + str(ex))
+
+                try:
+                    title = INVESTTMENT + " Position Report"
+                    rsh.generate_positions_summary_sheet(
+                        writer,
+                        fund,
+                        holdings_date,
+                        title,
+                        position_summary,
+                    )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating position report sheet\n\n" + str(ex))
+
+                try:
+                    title = INVESTTMENT + " Position Breakdown Report"
+                    rsh.generate_positions_breakdown_sheet(
+                        writer,
+                        fund,
+                        holdings_date,
+                        title,
+                        position_breakdown.sort_values('Exposure', ascending=False).fillna(0),
+                    )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating Position breakdown report sheet\n\n" + str(ex))
+
+                try:
+                    title = INVESTTMENT + " Factor Correlation Report"
+                    matrix_correlation.index.name = 'Factor Correlations'
+                    rsh.generate_factor_correlations_sheet(
+                        writer,
+                        matrix_correlation,
+                    )
+                except Exception as ex:
+                    MyExceptions.show_message(tab='main.py', message="Following exception occurred during generating Factor correlation report sheet\n\n" + str(ex))
+
 
             writer.close()
             logger.info(f"<--------------------------------  the run for {fund} is complete")
