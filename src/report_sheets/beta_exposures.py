@@ -5,7 +5,7 @@ import src.excel_utils.report_group_operations as rgo
 from src.excel_utils.header import insert_header
 from src.excel_utils.set_up_workbook import set_up_workbook
 from src.excel_utils.sheet_format import format_dashboard_worksheet
-from src.layouts.layouts import WideDashboardLayout
+from src.layouts.layouts import WideDashboardLayout1
 
 from ..report_items.report_table import ReportTable
 from ..report_items.snap_operations import SnapType
@@ -15,6 +15,14 @@ from datetime import datetime
 SHEET_NAME = "BetaExposures"
 
 
+def increase_size(worksheet_chart):
+    num_rows = worksheet_chart.snap_element.data.shape[0]
+    if num_rows < 4:
+        num_rows = num_rows + 1
+    worksheet_chart.custom_height = (num_rows+1) * 21
+    return worksheet_chart
+
+
 def generate_beta_exposures_sheet(
     writer,
     fund: str,
@@ -22,7 +30,7 @@ def generate_beta_exposures_sheet(
     title: str,
     data: Dict,
 ) -> None:
-    layout = WideDashboardLayout()
+    layout = WideDashboardLayout1()
     styles, worksheet = set_up_workbook(writer, sheet_name=SHEET_NAME)
     date_obj = datetime.strptime(holdings_date, "%Y-%m-%d")
     insert_header(worksheet, styles, layout, fund, date_obj, title=title)
@@ -52,6 +60,8 @@ def generate_beta_exposures_sheet(
         margin=1,
         axis_format="percentage",
     )
+    macro_sensitivity_chart.custom_width = 1330
+    macro_sensitivity_chart = increase_size(macro_sensitivity_chart)
     eu.insert_chart(
         writer,
         worksheet,
@@ -72,12 +82,13 @@ def generate_beta_exposures_sheet(
         table_name="sector_beta_decomp_df_fe",
         columns=[ "FactorExp",],
         categories_name="Sector Sensitivities",
-        snap_element=macro_beta_decomp_df,
+        snap_element=sector_beta_decomp_df,
         snap_mode=SnapType.RIGHT,
         page_layout=layout,
         margin=1,
         axis_format="percentage",
     )
+    sector_sensitivity_chart = increase_size(sector_sensitivity_chart)
     eu.insert_chart(writer, worksheet, sector_sensitivity_chart)
 
     format_dashboard_worksheet(worksheet, layout)

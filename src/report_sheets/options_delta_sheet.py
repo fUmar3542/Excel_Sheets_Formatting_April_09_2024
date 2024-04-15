@@ -25,7 +25,7 @@ def generate_option_delta_sheet(
     insert_header(worksheet, styles, layout, fund, date_obj, title=title)
 
     raw_formats = (
-        [None] + ["currency"] * 3 + ["percentage"]
+        ["currency"] + ["currency"] * 3 + ["percentage"]
         + ["float"] * 4
     )
     formats = [styles.get(fmt) for fmt in raw_formats]
