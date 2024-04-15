@@ -33,7 +33,6 @@ AGGREGATIONS = {
 GROUP_AGGREGATIONS = {"VaRTicker": "first", "Exposure": "sum"}
 
 
-
 SECURITY_TYPES = [
     "fixed", "future", "public", "prefer",
     "common", "reit", "fund", "mlp", "adr", 'etp'
@@ -169,10 +168,10 @@ def filter_stress_test_price_vol(
     for filter_item in filter_list:
         start_time2 = time.time()
         position_grouped = position_shock.groupby([filter_item,'price_shock','vol_shock'])[['shock_pnl',"shock_exposure"]].sum()
-        # record a data frame for the filter with only shock 
+        # record a data frame for the filter with only shock
         dd = position_grouped.reset_index()
         dd = dd.loc[(dd['price_shock']<0) & (dd['vol_shock']==0),[filter_item,'price_shock','shock_pnl']]
-        dd = pd.pivot_table(dd, values='shock_pnl', columns='price_shock', index= filter_item)
+        dd = pd.pivot_table(dd, values='shock_pnl', columns='price_shock', index=filter_item)
         dict_filtered[filter_item]=dd
 
         # make dictionnaries 

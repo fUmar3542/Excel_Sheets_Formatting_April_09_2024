@@ -134,14 +134,14 @@ def convert_aum_columns(aum: pd.DataFrame) -> pd.DataFrame:
 def return_analysis(AUM: pd.DataFrame, holdings_date, FirmName) -> pd.DataFrame:
     res1 = single_return_analysis(AUM, holdings_date, FirmName) 
     res = res1
-    if FirmName=="CRM": #run the return analysis a second time: starting on min(last years last date, inceptiondate)
+    if FirmName=="CRM": # run thhe return analysis a second time: starting on min(last years last date, inceptiondate)
         firstdtthisyear = datetime.date(pd.to_datetime(holdings_date).year,1,1)
         AUM2 = AUM.copy()
         AUM2.index = pd.to_datetime(AUM2.index)
         #lastyearlastdt = AUM2.loc[:firstdtthisyear,:].sort_index(ascending=False).index[0].date()
         AUM2 = AUM2.loc[firstdtthisyear:,:]
         res2= single_return_analysis(AUM2, holdings_date, FirmName) 
-        # arrange both df in a single table 
+        # arrange both df in a single table
         res2.rename(columns={'Fund':'Fund YTD','SPTR Index':'S&P TR YTD'},inplace=True)
         res1.rename(columns={'Fund':'Fund ITD','SPTR Index':'S&P TR ITD'},inplace=True)
         res=pd.concat([res1,res2],axis=1)

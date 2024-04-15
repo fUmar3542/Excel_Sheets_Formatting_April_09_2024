@@ -170,6 +170,7 @@ def insert_dashboard_tables(data, styles, worksheet) -> Dict[str, ReportTable]:
             total_format=styles.get("table_total_pct"),
             snap_element=greek_sensitivities,
             snap_mode=SnapType.DOWN,
+            margin=1,
         )
         eu.insert_table(worksheet, position_liq)
         return_dict.update({table_name: position_liq})
@@ -208,7 +209,7 @@ def insert_dashboard_tables(data, styles, worksheet) -> Dict[str, ReportTable]:
 
         # Assuming 'sector_exposure_df' exists in 'charts'
         df = data.get("sector_factor_decomp_df").copy()  # Create a copy to modify
-        df.iloc[:, 0] = df.iloc[:, 0].replace(to_replace=value_mapping)  # Replace values in first column
+        df.iloc[:, 0] = df.iloc[:, 0].replace(to_replace=value_mapping)  # Replace values in the first column
         sector_exposure = ReportTable(
             data=df,  # type: ignore
             table_name=table_name,
@@ -362,7 +363,7 @@ def insert_dashboard_charts(writer, layout, worksheet, report_tables, nm):
         charts.update({table_name: liquidity_chart})
     except Exception as ex:
         MyExceptions.show_message(tab='dashboard_sheet.py',
-                                  message="Following exception occurred during increasing the height of the chart\n\n" + str(
+                                  message="Following exception occurred during inserting chart\n\n" + str(
                                       ex))
     finally:
         return charts

@@ -15,7 +15,7 @@ import xlsxwriter
 from src.handles.exception_handling import MyExceptions
 
 # Global use of YAML file
-yaml_file = f"1623 Capital.yml"
+yaml_file = f"CRM.yml"
 if os.path.exists(yaml_file):
     with open(yaml_file, 'r') as file:
         config_data = yaml.safe_load(file)
@@ -803,7 +803,7 @@ if __name__ == "__main__":  # Execution of main procedure for laumch in command 
                     if not options_premium_df.empty:
                         options_premium_df.set_index("Premium", inplace=True)
 
-                    # 1.h., build rest of workbook beyond dashboard
+                    # 1.h., build rest of workbook beyond dashvoard
                     # Excel equivalents ["PNLReport"]
                     AUM_clean_df = pnl_stats.clean_nav_extra_filter(AUM_clean_df)
                     return_analysis_stats = pnl_stats.return_analysis(AUM_clean_df, holdings_date, investment_advisor)
