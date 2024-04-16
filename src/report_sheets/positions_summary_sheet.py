@@ -7,6 +7,7 @@ from src.excel_utils.sheet_format import format_dashboard_worksheet
 from src.layouts.layouts import PositionsDashboardLayout
 from src.report_items.report_table import ReportTable
 from datetime import datetime
+from src.handles.exception_handling import MyExceptions
 
 SHEET_NAME = "PositionsSummary"
 
@@ -25,22 +26,26 @@ def generate_positions_summary_sheet(
     date_obj = datetime.strptime(holdings_date, "%Y-%m-%d")
     insert_header(worksheet, styles, layout, fund, date_obj, title=title)
 
-    raw_formats = (
-        ["currency", "integer", "percentage"]
-        + ["float"] * 2
-        + ["percentage", "currency"]
-        + ["currency", "percentage"] * 2
-    )
-    formats = [styles.get(fmt) for fmt in raw_formats]
-    report_table = ReportTable(
-        initial_position=(1, 4),
-        data=data,
-        header_format=styles.get("table_header"), 
-        total_format=styles.get("table_total"),           
-        table_name="position_summary",
-        values_format=formats,
-    )
+    try:
+        raw_formats = (
+            ["currency", "integer", "percentage"]
+            + ["float"] * 2
+            + ["percentage", "currency"]
+            + ["currency", "percentage"] * 2
+        )
+        formats = [styles.get(fmt) for fmt in raw_formats]
+        report_table = ReportTable(
+            initial_position=(1, 4),
+            data=data,
+            header_format=styles.get("table_header"),
+            total_format=styles.get("table_total"),
+            table_name="position_summary",
+            values_format=formats,
+        )
 
-    eu.insert_table(worksheet, report_table)
-
-    format_dashboard_worksheet(worksheet, layout)
+        eu.insert_table(worksheet, report_table)
+        format_dashboard_worksheet(worksheet, layout)
+    except Exception as ex:
+        MyExceptions.show_message(tab='position_summary_sheet.py',
+                                  message="Following exception occurred during inserting tables into the sheet\n\n" + str(
+                                      ex))

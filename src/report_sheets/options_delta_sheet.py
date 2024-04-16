@@ -7,6 +7,7 @@ from src.excel_utils.sheet_format import format_dashboard_worksheet
 from src.layouts.layouts import PositionsDashboardLayout
 from src.report_items.report_table import ReportTable
 from datetime import datetime
+from src.handles.exception_handling import MyExceptions
 
 SHEET_NAME = "OptionsDelta"
 
@@ -23,21 +24,24 @@ def generate_option_delta_sheet(
     styles, worksheet = set_up_workbook(writer, sheet_name=SHEET_NAME)
     date_obj = datetime.strptime(holdings_date, "%Y-%m-%d")
     insert_header(worksheet, styles, layout, fund, date_obj, title=title)
+    try:
+        raw_formats = (
+            ["currency"] + ["currency"] * 3 + ["percentage"]
+            + ["float"] * 4
+        )
+        formats = [styles.get(fmt) for fmt in raw_formats]
+        report_table = ReportTable(
+            initial_position=(1, 4),
+            data=data["options_delta"],
+            header_format=styles.get("table_header"),
+            total_format=styles.get("table_total"),
+            table_name="options_delta",
+            values_format=formats,
+        )
 
-    raw_formats = (
-        ["currency"] + ["currency"] * 3 + ["percentage"]
-        + ["float"] * 4
-    )
-    formats = [styles.get(fmt) for fmt in raw_formats]
-    report_table = ReportTable(
-        initial_position=(1, 4),
-        data=data["options_delta"],
-        header_format=styles.get("table_header"), 
-        total_format=styles.get("table_total"),           
-        table_name="options_delta",
-        values_format=formats,
-    )
-
-    eu.insert_table(worksheet, report_table)
-
-    format_dashboard_worksheet(worksheet, layout)
+        eu.insert_table(worksheet, report_table)
+        format_dashboard_worksheet(worksheet, layout)
+    except Exception as ex:
+        MyExceptions.show_message(tab='open_delta_sheet.py',
+                                  message="Following exception occurred during inserting tables into the sheet\n\n" + str(
+                                      ex))
