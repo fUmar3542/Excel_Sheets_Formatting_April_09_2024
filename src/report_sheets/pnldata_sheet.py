@@ -38,7 +38,6 @@ def generate_pnldata_sheet(
             initial_position=(0, 0),
         )
         eu.insert_table(worksheet, aum_clean, date_index=True)
-
     except Exception as ex:
         MyExceptions.show_message(tab='pnldata_sheet.py',
                                   message="Following exception occurred during inserting a table into the sheet\n\n" + str(
@@ -64,7 +63,6 @@ def _add_cumulative_return_column(data: pd.DataFrame, col_name: str) -> pd.DataF
     """adds cummulative return to the data"""
     data[col_name] = data.ret.cumsum()
     return data
-
 
 
 def _add_window_std(
