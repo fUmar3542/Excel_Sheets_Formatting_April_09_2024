@@ -6,10 +6,10 @@ from src.excel_utils.header import insert_header
 from src.excel_utils.set_up_workbook import set_up_workbook
 from src.excel_utils.sheet_format import format_dashboard_worksheet
 from src.layouts.layouts import ExposureDashboardLayout
-
 from ..report_items.snap_operations import SnapType
 from ..report_items.worksheet_chart import WorksheetChart4
 from datetime import datetime
+from src.handles.exception_handling import MyExceptions
 
 SHEET_NAME = "ExpReport"
 
@@ -30,79 +30,93 @@ def generate_exp_report_sheet(
     report_tables = []
     report_charts = []
 
-    first_idx = 0 if fund =="Firm" else 1 if len(data[1]['Analyst Exposure'])>1 else 3   #ignore the first "Strategy" tables if this is not firm level 
-    
-    first_row_tableid1 = list(data[first_idx].keys())[0]
-    first_row_tableid2 = list(data[first_idx].keys())[1]
-    first_row_tablename1 = first_row_tableid1.replace(' ','_').lower()
-    #print(first_row_tablename1)
-    first_row_tablename2 = first_row_tableid2.replace(' ','_').lower()
-    first_row_tables = rgo.init_report_group(
-        styles=styles,
-    #    table_names=["strategy_exposure", "strategy_beta_exposure"],
-        table_names=[first_row_tablename1, first_row_tablename2],
-        tables=[
-            data[first_idx].get(first_row_tableid1),
-            data[first_idx].get(first_row_tableid2),
-        ],  # type: ignore
-        inner_snap_mode=SnapType.RIGHT,
-        inner_margin=1,
-        initial_position=(1, 4),  # type: ignore
-    )
+    try:
+        first_idx = 0 if fund =="Firm" else 1 if len(data[1]['Analyst Exposure'])>1 else 3   #ignore the first "Strategy" tables if this is not firm level
+        first_row_tableid1 = list(data[first_idx].keys())[0]
+        first_row_tableid2 = list(data[first_idx].keys())[1]
+        first_row_tablename1 = first_row_tableid1.replace(' ','_').lower()
+        #print(first_row_tablename1)
+        first_row_tablename2 = first_row_tableid2.replace(' ','_').lower()
+        first_row_tables = rgo.init_report_group(
+            styles=styles,
+        #    table_names=["strategy_exposure", "strategy_beta_exposure"],
+            table_names=[first_row_tablename1, first_row_tablename2],
+            tables=[
+                data[first_idx].get(first_row_tableid1),
+                data[first_idx].get(first_row_tableid2),
+            ],  # type: ignore
+            inner_snap_mode=SnapType.RIGHT,
+            inner_margin=1,
+            initial_position=(1, 4),  # type: ignore
+        )
 
-    report_tables.extend(first_row_tables)
-    
-    firstrow_chart = WorksheetChart4(
-        snap_element=report_tables[0],
-        snap_mode=SnapType.DOWN,
-        initial_rows=5,
-        page_layout=layout,
-        table_name=first_row_tablename1,
-        columns=["Long", "Short"],
-        #categories_name=first_row_tableid1,
-        title=first_row_tableid1,
-        categories_name=first_row_tableid1,
-        axis_format="percentage",
-        custom_height=400,
-        margin=2,
-        custom_padding=0,
-    )
-    report_charts.append(firstrow_chart)
+        report_tables.extend(first_row_tables)
+    except Exception as ex:
+        MyExceptions.show_message(tab='exposure_report_sheet.py',
+                                  message="Following exception occurred during inserting first row tables into the sheet\n\n" + str(
+                                      ex))
+
+    try:
+        firstrow_chart = WorksheetChart4(
+            snap_element=report_tables[0],
+            snap_mode=SnapType.DOWN,
+            initial_rows=5,
+            page_layout=layout,
+            table_name=first_row_tablename1,
+            columns=["Long", "Short"],
+            #categories_name=first_row_tableid1,
+            title=first_row_tableid1,
+            categories_name=first_row_tableid1,
+            axis_format="percentage",
+            custom_height=400,
+            margin=2,
+            custom_padding=0,
+        )
+        report_charts.append(firstrow_chart)
+    except Exception as ex:
+        MyExceptions.show_message(tab='exposure_report_sheet.py',
+                                  message="Following exception occurred during inserting first row chart into the sheet\n\n" + str(
+                                      ex))
 
     # temp = False
     # value = 2
-    table = None
-    ancor_element = report_tables[0]
-    for row in data[first_idx+1:]:
-        if len(row[list(row.keys())[0]])>1:
-            row_tables, row_chart = rgo.init_2_table_row_with_chart(
-                styles=styles,
-                layout=layout,
-                global_snap_to=ancor_element,
-                left_name=list(row.keys())[0],
-                left_table=list(row.values())[0],
-                right_name=list(row.keys())[1],
-                right_table=list(row.values())[1],
-                chart_columns=["Long", "Short"],
-            )
-            if row_chart.table_name == 'sector_exposure':
-                table = row_tables[0]
-            # if temp:
-            #     row_tables[0].position = (row_tables[0].position[0], row_tables[0].position[1]+value)
-            #     row_tables[1].position = (row_tables[1].position[0], row_tables[1].position[1]+value)
-            #     value = value + 2
-            # if row_chart.table_name == 'sector_exposure':
-            #     temp = True
-            # # if temp:
-            # #     row_chart.position = (row_chart.position[0], row_chart.position[1]+value)
-            ancor_element = row_tables[0]
-            report_tables.extend(row_tables)
-            report_charts.append(row_chart)
+    # table = None
+    try:
+        ancor_element = report_tables[0]
+        for row in data[first_idx+1:]:
+            if len(row[list(row.keys())[0]])>1:
+                row_tables, row_chart = rgo.init_2_table_row_with_chart(
+                    styles=styles,
+                    layout=layout,
+                    global_snap_to=ancor_element,
+                    left_name=list(row.keys())[0],
+                    left_table=list(row.values())[0],
+                    right_name=list(row.keys())[1],
+                    right_table=list(row.values())[1],
+                    chart_columns=["Long", "Short"],
+                )
+                # if row_chart.table_name == 'sector_exposure':
+                #     table = row_tables[0]
+                # if temp:
+                #     row_tables[0].position = (row_tables[0].position[0], row_tables[0].position[1]+value)
+                #     row_tables[1].position = (row_tables[1].position[0], row_tables[1].position[1]+value)
+                #     value = value + 2
+                # if row_chart.table_name == 'sector_exposure':
+                #     temp = True
+                # # if temp:
+                # #     row_chart.position = (row_chart.position[0], row_chart.position[1]+value)
+                ancor_element = row_tables[0]
+                report_tables.extend(row_tables)
+                report_charts.append(row_chart)
 
-    for table in report_tables:
-        eu.insert_table(worksheet, table)
+        for table in report_tables:
+            eu.insert_table(worksheet, table)
 
-    for report_chart in report_charts:
-        eu.insert_chart(writer, worksheet, report_chart)
+        for report_chart in report_charts:
+            eu.insert_chart(writer, worksheet, report_chart)
 
-    format_dashboard_worksheet(worksheet, layout)
+        format_dashboard_worksheet(worksheet, layout)
+    except Exception as ex:
+        MyExceptions.show_message(tab='exposure_report_sheet.py',
+                                  message="Following exception occurred during inserting series row tables and charts into the sheet\n\n" + str(
+                                      ex))
