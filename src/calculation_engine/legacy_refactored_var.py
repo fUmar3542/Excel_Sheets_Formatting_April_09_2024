@@ -6,6 +6,7 @@ import config
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from src.handles.exception_handling import MyExceptions
 
 QUANTILES = config.global_settings.get("quantiles", {})
 
@@ -18,7 +19,6 @@ VAR_DATA_COLUMNS = [
     "TradeDate", "Client", "Strat", "VaRType",
     "VaRSubType", "AttributeType", "AttributeValue", "VaRValue"
 ]
-
 
 
 def calculate_vars(
@@ -43,63 +43,69 @@ def calculate_vars(
         pd.DataFrame: VarData table that has
             columns described in VAR_DATA_COLUMNS
     '''
-    var_tickers = positions.VaRTicker.unique()
-    prices = prices[var_tickers]  # type: ignore
-    trade_date = positions.TradeDate[0]
-    client = str(positions.iloc[0, 1])
-    # exposure = positions.groupby('VaRTicker').sum('Exposure').values
-    exposure = positions.groupby('VaRTicker').agg({'Exposure': 'sum'})
-    # exposure = positions.loc[:, "Exposure"].values
+    var_data = None
+    try:
+        var_tickers = positions.VaRTicker.unique()
+        prices = prices[var_tickers]  # type: ignore
+        trade_date = positions.TradeDate[0]
+        client = str(positions.iloc[0, 1])
+        # exposure = positions.groupby('VaRTicker').sum('Exposure').values
+        exposure = positions.groupby('VaRTicker').agg({'Exposure': 'sum'})
+        # exposure = positions.loc[:, "Exposure"].values
 
-    # PositionCovarianceMatrix
-    log_returns = np.log(prices / prices.shift(1))  # type: ignore
-    control_position_covariance = log_returns.cov()  # type: ignore
+        # PositionCovarianceMatrix
+        log_returns = np.log(prices / prices.shift(1))  # type: ignore
+        control_position_covariance = log_returns.cov()  # type: ignore
 
-    var_data = pd.DataFrame(columns=VAR_DATA_COLUMNS)
+        var_data = pd.DataFrame(columns=VAR_DATA_COLUMNS)
 
-    # FirmLevelTotals
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore", message="invalid value encountered in sqrt")
-        stdev = np.sqrt(
-            exposure.T @ (control_position_covariance @ exposure)
-        )  # type: ignore
+        # FirmLevelTotals
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore", message="invalid value encountered in sqrt")
+            stdev = np.sqrt(
+                exposure.T @ (control_position_covariance @ exposure)
+            )  # type: ignore
 
-    var_data.loc[0] = [
-        trade_date, client, "FirmLevel", "StDev",
-        "Total", "Total", "Fund", stdev.iloc[0, 0],  # type: ignore
-    ]
+        var_data.loc[0] = [
+            trade_date, client, "FirmLevel", "StDev",
+            "Total", "Total", "Fund", stdev.iloc[0, 0],  # type: ignore
+        ]
 
-    var_data = add_vars_to_var_data(
-        var_data=var_data,
-        stdev=stdev.iloc[0, 0],  # type: ignore
-        trade_date=trade_date,  # type: ignore
-        client=client,
-        control_group="Total",
-        control_group_item="Total",
-        quantiles=list(QUANTILES.keys()),
-        var_type='Fund',
-    )
+        var_data = add_vars_to_var_data(
+            var_data=var_data,
+            stdev=stdev.iloc[0, 0],  # type: ignore
+            trade_date=trade_date,  # type: ignore
+            client=client,
+            control_group="Total",
+            control_group_item="Total",
+            quantiles=list(QUANTILES.keys()),
+            var_type='Fund',
+        )
 
-    # CompVaR
-    mvar = control_position_covariance @ exposure
-    compvar = np.nan_to_num(
-        mvar / stdev.iloc[0, 0] * exposure,  # type: ignore
-        nan=0.0
-    )
+        # CompVaR
+        mvar = control_position_covariance @ exposure
+        compvar = np.nan_to_num(
+            mvar / stdev.iloc[0, 0] * exposure,  # type: ignore
+            nan=0.0
+        )
 
-    # FirmLevel
-    var_data = add_firm_level_vars(
-        var_data,
-        positions,
-        trade_date,
-        client,
-        log_returns,
-        control_position_covariance,
-        compvar
-    )
-
-    return var_data
+        # FirmLevel
+        var_data = add_firm_level_vars(
+            var_data,
+            positions,
+            trade_date,
+            client,
+            log_returns,
+            control_position_covariance,
+            compvar
+        )
+    except Exception as ex:
+        MyExceptions.show_message(tab='legacy_refactored_var.py',
+                                  message="Following exception occurred during calculating vars\n\n" + str(
+                                      ex))
+    finally:
+        return var_data
 
 
 def add_firm_level_vars(
@@ -114,42 +120,47 @@ def add_firm_level_vars(
     '''
     calculates firm level VaRs for every group
     '''
-    for control_group in CONTROL_GROUPS:
-        filter_items = extract_group_items(positions, control_group)
-        for control_group_item in tqdm(
-            filter_items,
-            desc=f"Calculating firm level VaRs for {control_group}",
-        ):
-            # Isolated
-            filtered_positions = positions.query(
-                f"{control_group} == @control_group_item"
-            )
-            group_exposure = filtered_positions\
-                .groupby('VaRTicker')\
-                .agg({'Exposure': 'sum'})
-            control_position_covariance = log_returns[group_exposure.index].\
-                cov()
+    try:
+        for control_group in CONTROL_GROUPS:
+            filter_items = extract_group_items(positions, control_group)
+            for control_group_item in tqdm(
+                filter_items,
+                desc=f"Calculating firm level VaRs for {control_group}",
+            ):
+                # Isolated
+                filtered_positions = positions.query(
+                    f"{control_group} == @control_group_item"
+                )
+                group_exposure = filtered_positions\
+                    .groupby('VaRTicker')\
+                    .agg({'Exposure': 'sum'})
+                control_position_covariance = log_returns[group_exposure.index].\
+                    cov()
 
-            var_data = add_control_group_isolated_var(
-                tradedate, client, control_position_covariance,
-                control_group, control_group_item, group_exposure,
-                var_data
-            )
+                var_data = add_control_group_isolated_var(
+                    tradedate, client, control_position_covariance,
+                    control_group, control_group_item, group_exposure,
+                    var_data
+                )
 
-            # Component
-            var_data = add_control_group_component_var(
-                positions, tradedate, client,
-                compvar, control_group, control_group_item,
-                var_data
-            )
+                # Component
+                var_data = add_control_group_component_var(
+                    positions, tradedate, client,
+                    compvar, control_group, control_group_item,
+                    var_data
+                )
 
-            # Incremental
-            var_data = add_control_group_incremental_var(
-                positions, tradedate, client, log_returns,
-                control_group, control_group_item, var_data
-            )
-
-    return var_data
+                # Incremental
+                var_data = add_control_group_incremental_var(
+                    positions, tradedate, client, log_returns,
+                    control_group, control_group_item, var_data
+                )
+    except Exception as ex:
+        MyExceptions.show_message(tab='legacy_refactored_var.py',
+                                  message="Following exception occurred during adding firm level vars\n\n" + str(
+                                      ex))
+    finally:
+        return var_data
 
 
 def add_control_group_incremental_var(
@@ -161,26 +172,31 @@ def add_control_group_incremental_var(
     control_group_item,
     var_data,
 ) -> pd.DataFrame:
-    '''calculates incremental var for a given quantiles'''
-    incremental_component_stdev = calculate_incremental_stdev(
-        positions,
-        log_returns,
-        control_group,
-        control_group_item,
-    )  # type: ignore
+    try:
+        '''calculates incremental var for a given quantiles'''
+        incremental_component_stdev = calculate_incremental_stdev(
+            positions,
+            log_returns,
+            control_group,
+            control_group_item,
+        )  # type: ignore
 
-    var_data = add_vars_to_var_data(
-        var_data=var_data,
-        stdev=incremental_component_stdev,
-        trade_date=tradedate,
-        client=client,
-        control_group=control_group,
-        control_group_item=control_group_item,
-        quantiles=list(QUANTILES.keys()),
-        var_type="Incremental",
-    )
-
-    return var_data
+        var_data = add_vars_to_var_data(
+            var_data=var_data,
+            stdev=incremental_component_stdev,
+            trade_date=tradedate,
+            client=client,
+            control_group=control_group,
+            control_group_item=control_group_item,
+            quantiles=list(QUANTILES.keys()),
+            var_type="Incremental",
+        )
+    except Exception as ex:
+        MyExceptions.show_message(tab='legacy_refactored_var.py',
+                                  message="Following exception occurred during adding incremental control groups\n\n" + str(
+                                      ex))
+    finally:
+        return var_data
 
 
 def add_control_group_component_var(
@@ -192,28 +208,33 @@ def add_control_group_component_var(
     control_group_item,
     var_data
 ) -> pd.DataFrame:
-    '''calculates component var for a given quantiles'''
-    exposure = positions\
-        .groupby('VaRTicker')\
-        .agg({'Exposure': 'sum'})
+    try:
+        '''calculates component var for a given quantiles'''
+        exposure = positions\
+            .groupby('VaRTicker')\
+            .agg({'Exposure': 'sum'})
 
-    component_stdev = np.nan_to_num(
-        (exposure * compvar).sum(),
-        nan=0,
-    )[0]
+        component_stdev = np.nan_to_num(
+            (exposure * compvar).sum(),
+            nan=0,
+        )[0]
 
-    var_data = add_vars_to_var_data(
-        var_data=var_data,
-        stdev=component_stdev,
-        trade_date=tradedate,
-        client=client,
-        control_group=control_group,
-        control_group_item=control_group_item,
-        quantiles=list(QUANTILES.keys()),
-        var_type="Component",
-    )
-
-    return var_data
+        var_data = add_vars_to_var_data(
+            var_data=var_data,
+            stdev=component_stdev,
+            trade_date=tradedate,
+            client=client,
+            control_group=control_group,
+            control_group_item=control_group_item,
+            quantiles=list(QUANTILES.keys()),
+            var_type="Component",
+        )
+    except Exception as ex:
+        MyExceptions.show_message(tab='legacy_refactored_var.py',
+                                  message="Following exception occurred during adding component control var\n\n" + str(
+                                      ex))
+    finally:
+        return var_data
 
 
 def add_control_group_isolated_var(
@@ -225,34 +246,39 @@ def add_control_group_isolated_var(
         group_exposure: pd.DataFrame,
         var_data: pd.DataFrame,
 ) -> pd.DataFrame:
-    '''calculates isolated components for a given quantiles'''
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore",
-            message="invalid value encountered in sqrt",
-        )
-        group_strdev = np.sqrt(
-            np.nan_to_num(
-                group_exposure.T @ (
-                    control_position_covariance @
-                    group_exposure
-                ),
-                nan=0,
+    try:
+        '''calculates isolated components for a given quantiles'''
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message="invalid value encountered in sqrt",
             )
-        )[0, 0]  # type: ignore
+            group_strdev = np.sqrt(
+                np.nan_to_num(
+                    group_exposure.T @ (
+                        control_position_covariance @
+                        group_exposure
+                    ),
+                    nan=0,
+                )
+            )[0, 0]  # type: ignore
 
-    var_data = add_vars_to_var_data(
-        trade_date=tradedate,
-        client=client,
-        var_data=var_data,  # type: ignore
-        control_group=control_group,
-        control_group_item=control_group_item,
-        stdev=group_strdev,  # type: ignore
-        quantiles=list(QUANTILES.keys()),
-        var_type="Isolated",
-    )  # type: ignore
-
-    return var_data
+        var_data = add_vars_to_var_data(
+            trade_date=tradedate,
+            client=client,
+            var_data=var_data,  # type: ignore
+            control_group=control_group,
+            control_group_item=control_group_item,
+            stdev=group_strdev,  # type: ignore
+            quantiles=list(QUANTILES.keys()),
+            var_type="Isolated",
+        )  # type: ignore
+    except Exception as ex:
+        MyExceptions.show_message(tab='legacy_refactored_var.py',
+                                  message="Following exception occurred during calculating isolated components\n\n" + str(
+                                      ex))
+    finally:
+        return var_data
 
 
 def calculate_incremental_stdev(
@@ -261,22 +287,29 @@ def calculate_incremental_stdev(
     control_group: str,
     control_group_item: str,
 ) -> pd.DataFrame:
-    '''calculates stdv when excluding control group item'''
-    exclude_condition = positions[control_group] != control_group_item
-    positions_without_group_item = positions.loc[exclude_condition, :]
-    isolated_exposure = positions_without_group_item\
-        .groupby('VaRTicker')\
-        .agg({'Exposure': 'sum'})\
+    component_stdev = None
+    try:
+        '''calculates stdv when excluding control group item'''
+        exclude_condition = positions[control_group] != control_group_item
+        positions_without_group_item = positions.loc[exclude_condition, :]
+        isolated_exposure = positions_without_group_item\
+            .groupby('VaRTicker')\
+            .agg({'Exposure': 'sum'})\
 
-    control_position_covariance = log_returns[isolated_exposure.index].cov()
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore", message="invalid value encountered in sqrt")
-        component_stdev = np.sqrt(
-            isolated_exposure.T @ (control_position_covariance @
-                                   isolated_exposure)
-        )  # type: ignore
-    return np.nan_to_num(component_stdev, nan=0)[0, 0]
+        control_position_covariance = log_returns[isolated_exposure.index].cov()
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore", message="invalid value encountered in sqrt")
+            component_stdev = np.sqrt(
+                isolated_exposure.T @ (control_position_covariance @
+                                       isolated_exposure)
+            )  # type: ignore
+    except Exception as ex:
+        MyExceptions.show_message(tab='legacy_refactored_var.py',
+                                  message="Following exception occurred during calculating stdev\n\n" + str(
+                                      ex))
+    finally:
+        return np.nan_to_num(component_stdev, nan=0)[0, 0]
 
 
 def add_vars_to_var_data(
@@ -290,20 +323,26 @@ def add_vars_to_var_data(
     var_type: str,
 ) -> pd.DataFrame:
     '''adds isolated components for a given quantiles to var_data'''
-    for quantile in quantiles:
-        var_row = calculate_isolated_group_var(
-            var_data=var_data,
-            stdev=stdev,
-            tradedate=trade_date,
-            client=client,
-            control_group=control_group,
-            control_group_item=control_group_item,
-            quantile=quantile,
-            var_type=var_type,
-        )
-        var_data = pd.concat([var_data, var_row], ignore_index=True)
-        # var_data.append(var_row)  # type: ignore
-    return var_data
+    try:
+        for quantile in quantiles:
+            var_row = calculate_isolated_group_var(
+                var_data=var_data,
+                stdev=stdev,
+                tradedate=trade_date,
+                client=client,
+                control_group=control_group,
+                control_group_item=control_group_item,
+                quantile=quantile,
+                var_type=var_type,
+            )
+            var_data = pd.concat([var_data, var_row], ignore_index=True)
+            # var_data.append(var_row)  # type: ignore
+    except Exception as ex:
+        MyExceptions.show_message(tab='legacy_refactored_var.py',
+                                  message="Following exception occurred during adding vars to vars data\n\n" + str(
+                                      ex))
+    finally:
+        return var_data
 
 
 def calculate_isolated_group_var(
@@ -317,17 +356,22 @@ def calculate_isolated_group_var(
     var_type: str,
 ) -> pd.DataFrame:
     '''Calculates the group var for a given quantile'''
-
-    group_var = stdev * QUANTILES[quantile]  # type: ignore
-    var_row = pd.DataFrame(
-        [[
-            tradedate, client, "FirmLevel", f"{quantile}VaR", var_type,
-            control_group, control_group_item, group_var,
-        ]],
-        columns=var_data.columns
-    )
-
-    return var_row
+    var_row = None
+    try:
+        group_var = stdev * QUANTILES[quantile]  # type: ignore
+        var_row = pd.DataFrame(
+            [[
+                tradedate, client, "FirmLevel", f"{quantile}VaR", var_type,
+                control_group, control_group_item, group_var,
+            ]],
+            columns=var_data.columns
+        )
+    except Exception as ex:
+        MyExceptions.show_message(tab='legacy_refactored_var.py',
+                                  message="Following exception occurred during calculating isolated group vars\n\n" + str(
+                                      ex))
+    finally:
+        return var_row
 
 
 def extract_group_items(positions, control_group):

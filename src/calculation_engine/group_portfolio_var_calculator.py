@@ -8,6 +8,7 @@ import pandas as pd
 
 from src.calculation_engine.portfolio_var_calculator import \
     PortfolioVarCalculator
+from src.handles.exception_handling import MyExceptions
 
 
 @dataclass
@@ -142,23 +143,27 @@ class GroupVarCalculator:
         """returns isolated var calculators for each ticker"""
 
         return_dict = {}
-
-        groups = self._group_weights.index.levels[0]  # type: ignore
-        for group in groups:
-            group_positions = self._group_positions.loc[group].index.values
-            # remove group positions from the positions table
-            match_condition = (self.positions_table[self.group_column] == group) & (
-                self.positions_table["VaRTicker"].isin(group_positions)
-            )
-            incremental_positions = self.positions_table.loc[~match_condition, :]
-            # calculator of the portfolio var for the remaining positions
-            return_dict[group] = PortfolioVarCalculator(
-                prices_table=self.prices_table,
-                positions_table=incremental_positions,
-                nav = self.nav
-            )
-
-        return return_dict
+        try:
+            groups = self._group_weights.index.levels[0]  # type: ignore
+            for group in groups:
+                group_positions = self._group_positions.loc[group].index.values
+                # remove group positions from the positions table
+                match_condition = (self.positions_table[self.group_column] == group) & (
+                    self.positions_table["VaRTicker"].isin(group_positions)
+                )
+                incremental_positions = self.positions_table.loc[~match_condition, :]
+                # calculator of the portfolio var for the remaining positions
+                return_dict[group] = PortfolioVarCalculator(
+                    prices_table=self.prices_table,
+                    positions_table=incremental_positions,
+                    nav = self.nav
+                )
+        except Exception as ex:
+            MyExceptions.show_message(tab='group_portfolio_var_calculator.py',
+                                  message="Following exception occurred during calculating isolated groups\n\n" + str(
+                                      ex))
+        finally:
+            return return_dict
 
     def _group_incremental_var(self, group, quantile) -> pd.Series:
         """returns incremental var for given quantile"""

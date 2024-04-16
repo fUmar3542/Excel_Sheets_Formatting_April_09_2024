@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 from typing import Dict, Any
+from src.handles.exception_handling import MyExceptions
 
 logger = logging.getLogger(__name__)
 QUANTILES = config.global_settings.get("quantiles", {})
@@ -116,16 +117,23 @@ class PortfolioVarCalculator:
     @cached_property
     def _position_std_filtered(self) -> pd.Series:
         '''returns EWMA filtered stdev '''
-        tmp = self._position_log_returns.copy()
-        N= len(tmp)
-        tmp = tmp **2
-        tmp['decay'] = [(1-DECAY_FACTOR)*(DECAY_FACTOR**(N-i-1)) for i in range(N)]
-        for c in tmp.columns[:-1]:
-            tmp[c]=tmp[c]*tmp['decay']
-        tmp.drop(columns='decay',inplace=True)
-        return_series = tmp.sum().apply(lambda x:np.sqrt(x))
-        return_series.index.name = 'VaRTicker'
-        return return_series
+        return_series = None
+        try:
+            tmp = self._position_log_returns.copy()
+            N= len(tmp)
+            tmp = tmp **2
+            tmp['decay'] = [(1-DECAY_FACTOR)*(DECAY_FACTOR**(N-i-1)) for i in range(N)]
+            for c in tmp.columns[:-1]:
+                tmp[c]=tmp[c]*tmp['decay']
+            tmp.drop(columns='decay',inplace=True)
+            return_series = tmp.sum().apply(lambda x:np.sqrt(x))
+            return_series.index.name = 'VaRTicker'
+        except Exception as ex:
+            MyExceptions.show_message(tab='portfolio_var_calculator.py',
+                                  message="Following exception occurred during applying std filter\n\n" + str(
+                                      ex))
+        finally:
+            return return_series
 
     @cached_property
     def _position_cov_filtered(self) -> pd.DataFrame: #XM created: EWMA covariance
@@ -148,19 +156,23 @@ class PortfolioVarCalculator:
     @cached_property
     def _isolated_calculators(self) -> Dict[str, Any]:
         '''returns isolated var calculators for each ticker'''
-
         return_dict = {}
-        for ticker in self._var_tickers:
-            incremental_positions = self.positions_table.loc[
-                self.positions_table.VaRTicker != ticker, :
-            ]
-            return_dict[ticker] = PortfolioVarCalculator(
-                prices_table=self.prices_table,
-                positions_table=incremental_positions,
-                nav = self.nav
-            )
-
-        return return_dict
+        try:
+            for ticker in self._var_tickers:
+                incremental_positions = self.positions_table.loc[
+                    self.positions_table.VaRTicker != ticker, :
+                ]
+                return_dict[ticker] = PortfolioVarCalculator(
+                    prices_table=self.prices_table,
+                    positions_table=incremental_positions,
+                    nav = self.nav
+                )
+        except Exception as ex:
+            MyExceptions.show_message(tab='portfolio_var_calculator.py',
+                                  message="Following exception occurred during calculating isolated vars\n\n" + str(
+                                      ex))
+        finally:
+            return return_dict
 
     def _ticker_incremental_var(
         self,

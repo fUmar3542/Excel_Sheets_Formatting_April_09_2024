@@ -20,6 +20,7 @@ from tqdm import tqdm
 
 from src.calculation_engine import GroupVarCalculator, PortfolioVarCalculator
 from src.calculation_engine.constants import GROUP_LEVELS
+from src.handles.exception_handling import MyExceptions
 
 # from tqdm import tqdm
 
@@ -32,6 +33,7 @@ OUTPUT_COLUMNS = ['strat', 'var_type',
 
 # maps the VaR groups to the columns used to Group ...
 
+
 def calculate_vars(
     prices: pd.DataFrame,
     positions: pd.DataFrame, 
@@ -43,52 +45,59 @@ def calculate_vars(
     it returns a dataframe that has columns for each quantile
     per var type (isolated and component)
     '''
-        
-    return_data = pd.DataFrame(
-        columns=['group', 'var_type', 'var_confidence', 'attribute', 'var'])
 
-    var_calculators = _set_up_var_calculators(prices, positions, nav)
+    return_data = None
 
-    for group, calculator in tqdm(var_calculators.items(), 'Estimating VAR'):
-        for quantile_name, quantile in QUANTILES.items():
-            # add group totals
-            return_data = _add_row(
-                data=return_data,
-                group=group,
-                var_type='portfolio',
-                confidence=quantile_name,
-                attribute='total',
-                var=calculator.portfolio_var(quantile)
-            )
-            logger.info(f'finished estimating portfolio var for {group}')
-            # add isloated vars
-            return_data = _add_sub_table(
-                data=return_data,
-                new_vars=calculator.isolated_var(quantile),
-                group=group,
-                var_type='isolated',
-                confidence=quantile_name
-            )
+    try:
+        return_data = pd.DataFrame(
+            columns=['group', 'var_type', 'var_confidence', 'attribute', 'var'])
 
-            logger.info(f'finished estimating isolated var for {group}')
-            # add component_vars
-            return_data = _add_sub_table(
-                data=return_data,
-                new_vars=calculator.component_var(quantile),
-                group=group,
-                var_type='component',
-                confidence=quantile_name
-            )
-            # add incremental_vars
-            return_data = _add_sub_table(
-                data=return_data,
-                new_vars=calculator.incremental_var(quantile),
-                group=group,
-                var_type='incremental',
-                confidence=quantile_name
-            )
-            logger.info(
-                f'finished estimating incremental var for group {group}')
+        var_calculators = _set_up_var_calculators(prices, positions, nav)
+
+        for group, calculator in tqdm(var_calculators.items(), 'Estimating VAR'):
+            for quantile_name, quantile in QUANTILES.items():
+                # add group totals
+                return_data = _add_row(
+                    data=return_data,
+                    group=group,
+                    var_type='portfolio',
+                    confidence=quantile_name,
+                    attribute='total',
+                    var=calculator.portfolio_var(quantile)
+                )
+                logger.info(f'finished estimating portfolio var for {group}')
+                # add isloated vars
+                return_data = _add_sub_table(
+                    data=return_data,
+                    new_vars=calculator.isolated_var(quantile),
+                    group=group,
+                    var_type='isolated',
+                    confidence=quantile_name
+                )
+
+                logger.info(f'finished estimating isolated var for {group}')
+                # add component_vars
+                return_data = _add_sub_table(
+                    data=return_data,
+                    new_vars=calculator.component_var(quantile),
+                    group=group,
+                    var_type='component',
+                    confidence=quantile_name
+                )
+                # add incremental_vars
+                return_data = _add_sub_table(
+                    data=return_data,
+                    new_vars=calculator.incremental_var(quantile),
+                    group=group,
+                    var_type='incremental',
+                    confidence=quantile_name
+                )
+                logger.info(
+                    f'finished estimating incremental var for group {group}')
+    except Exception as ex:
+        MyExceptions.show_message(tab='var_calculator.py',
+                                  message="Following exception occurred during calculating isolated and component var\n\n" + str(
+                                      ex))
     return return_data
 
 
@@ -132,35 +141,49 @@ def _add_sub_table(
     adds new set of lines, each corresponding to an attribute value with the
     corresponding var value    
     '''
-    return_data = new_vars\
-        .to_frame(name='var')\
-        .reset_index()\
-        .rename(
-            columns={new_vars.index.name: 'attribute'}
-        )
-    return_data['group'] = group
-    return_data['var_type'] = var_type
-    return_data['var_confidence'] = confidence
+    return_data = None
+    try:
+        return_data = new_vars\
+            .to_frame(name='var')\
+            .reset_index()\
+            .rename(
+                columns={new_vars.index.name: 'attribute'}
+            )
+        return_data['group'] = group
+        return_data['var_type'] = var_type
+        return_data['var_confidence'] = confidence
 
-    return_data = pd.concat([
-        data,
-        return_data[['group', 'var_type',
-                     'var_confidence', 'attribute', 'var']]
-    ])
-    return return_data
+        return_data = pd.concat([
+            data,
+            return_data[['group', 'var_type',
+                         'var_confidence', 'attribute', 'var']]
+        ])
+    except Exception as ex:
+        MyExceptions.show_message(tab='var_calculator.py',
+                                  message="Following exception occurred during adding sub table\n\n" + str(
+                                      ex))
+    finally:
+        return return_data
 
-def _set_up_var_calculators(prices, positions,nav) -> Dict[str, Any]:
+
+def _set_up_var_calculators(prices, positions, nav) -> Dict[str, Any]:
     '''set up classes for portfolio var calculations'''
-    var_calculators = {
-        'total': PortfolioVarCalculator(
-            prices_table=prices,
-            positions_table=positions,
-            nav = nav
-        ),
-    }
-    var_calculators.update({
-        key: GroupVarCalculator(value, prices, positions, nav)
-        for key, value in GROUP_LEVELS.items()
-    })  # type: ignore
-
-    return var_calculators
+    var_calculators = None
+    try:
+        var_calculators = {
+            'total': PortfolioVarCalculator(
+                prices_table=prices,
+                positions_table=positions,
+                nav = nav
+            ),
+        }
+        var_calculators.update({
+            key: GroupVarCalculator(value, prices, positions, nav)
+            for key, value in GROUP_LEVELS.items()
+        })  # type: ignore
+    except Exception as ex:
+        MyExceptions.show_message(tab='var_calculator.py',
+                                  message="Following exception occurred during setting up var calculator\n\n" + str(
+                                      ex))
+    finally:
+        return var_calculators

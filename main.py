@@ -143,7 +143,7 @@ def read_nav_history(investment_advisor, holdings_date):
         AUM_clean.index = pd.to_datetime(AUM_clean.index).strftime("%Y-%m-%d")
     except Exception as ex:
         MyExceptions.show_message(tab='main.py',
-                                  message="Following exception occurred during reading nav history\n\n" + str(ex))
+                                  message="Following exception occurred during reading nav history sheet\n\n" + str(ex))
     finally:
         return AUM_dict, AUM_clean, AUM_clean_funds
 
